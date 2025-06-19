@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 
 export default function AllTasks() {
     const [tasks, setTasks] = useState([]);
+    const [filteredTasks, setFilteredTasks] = useState([]);
+    const [selectedDate, setSelectedDate] = useState('');
     const [error, setError] = useState(null);
 
     const fetchTasks = async () => {
@@ -12,8 +14,12 @@ export default function AllTasks() {
                 credentials: 'include',
             });
             const data = await res.json();
-            if (res.ok) setTasks(data);
-            else setError(data.error || 'Failed to fetch tasks');
+            if (res.ok) {
+                setTasks(data);
+                setFilteredTasks(data);
+            } else {
+                setError(data.error || 'Failed to fetch tasks');
+            }
         } catch (err) {
             console.error(err);
             setError('Server error');
@@ -21,9 +27,7 @@ export default function AllTasks() {
     };
 
     const deleteTask = async (id) => {
-        const confirmDelete = window.confirm('Are you sure you want to delete this task?');
-        if (!confirmDelete) return;
-
+        if (!window.confirm('Are you sure you want to delete this task?')) return;
         try {
             const res = await fetch(`http://localhost:4000/api/user_schedule_delete/${id}`, {
                 method: 'DELETE',
@@ -31,7 +35,9 @@ export default function AllTasks() {
             });
 
             if (res.ok) {
-                setTasks(prev => prev.filter(task => task._id !== id));
+                const updated = tasks.filter(task => task._id !== id);
+                setTasks(updated);
+                setFilteredTasks(filterTasksByDate(updated, selectedDate));
             } else {
                 const data = await res.json();
                 alert(data.error || 'Delete failed');
@@ -41,7 +47,23 @@ export default function AllTasks() {
             alert('Server error');
         }
     };
-    
+
+    const filterTasksByDate = (taskList, date) => {
+        if (!date) return taskList;
+        console.log(taskList)
+        console.log(date)
+        return taskList.filter(task => {
+            const taskStartDate = new Date(task.startTime).toISOString().split('T')[0];
+            const taskEndDate = new Date(task.endTime).toISOString().split('T')[0];
+            return (taskStartDate === date) || (taskEndDate===date);
+        });
+    };
+
+    const handleDateChange = (e) => {
+        const date = e.target.value;
+        setSelectedDate(date);
+        setFilteredTasks(filterTasksByDate(tasks, date));
+    };
 
     useEffect(() => {
         fetchTasks();
@@ -51,7 +73,22 @@ export default function AllTasks() {
         <div style={{ maxWidth: 800, margin: 'auto' }}>
             <h2>All Scheduled Tasks</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            {tasks.length === 0 ? (
+
+            <div style={{ marginBottom: '15px' }}>
+                <label>
+                    Filter by Start Date:{' '}
+                    <input type="date" value={selectedDate} onChange={handleDateChange} />
+                    {' '}
+                    <button onClick={() => {
+                        setSelectedDate('');
+                        setFilteredTasks(tasks);
+                    }}>
+                        Reset
+                    </button>
+                </label>
+            </div>
+
+            {filteredTasks.length === 0 ? (
                 <p>No tasks found.</p>
             ) : (
                 <table border="1" cellPadding="10" width="100%">
@@ -65,7 +102,7 @@ export default function AllTasks() {
                         </tr>
                     </thead>
                     <tbody>
-                        {tasks.map(task => (
+                        {filteredTasks.map(task => (
                             <tr key={task._id}>
                                 <td>{task.taskName}</td>
                                 <td>{task.category}</td>
