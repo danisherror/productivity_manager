@@ -11,7 +11,7 @@ export default function AllTasks() {
 
     const fetchTasks = async () => {
         try {
-            const res = await fetch('http://localhost:4000/api/user_schedule_getAll', {
+            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_getAll`, {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -65,7 +65,7 @@ export default function AllTasks() {
     const deleteTask = async (id) => {
         if (!window.confirm('Are you sure you want to delete this task?')) return;
         try {
-            const res = await fetch(`http://localhost:4000/api/user_schedule_delete/${id}`, {
+            const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_delete/${id}`, {
                 method: 'DELETE',
                 credentials: 'include'
             });
@@ -150,7 +150,7 @@ export default function AllTasks() {
                                 <td>{new Date(task.startTime).toLocaleString()}</td>
                                 <td>{new Date(task.endTime).toLocaleString()}</td>
                                 <td>
-                                    <Link to={`/edit-task/${task._id}`}>Edit</Link> |{' '}
+                                    <Link to={`/EditTask/${task._id}`}>Edit</Link> |{' '}
                                     <button onClick={() => deleteTask(task._id)}>Delete</button>
                                 </td>
                             </tr>

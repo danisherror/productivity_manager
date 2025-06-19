@@ -10,7 +10,7 @@ const Navbar = () => {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/me', {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/me`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -26,7 +26,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/logout', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`, {
         method: 'POST',
         credentials: 'include',
       });

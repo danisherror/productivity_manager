@@ -10,7 +10,7 @@ export default function EditTask() {
   useEffect(() => {
     const fetchTask = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/api/user_schedule_getByID/${id}`, {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_getByID/${id}`, {
             method: 'GET',
           credentials: 'include',
         });
@@ -61,7 +61,7 @@ export default function EditTask() {
             energyLevel
         };
 
-      const res = await fetch(`http://localhost:4000/api/user_schedule_update/${id}`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_update/${id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

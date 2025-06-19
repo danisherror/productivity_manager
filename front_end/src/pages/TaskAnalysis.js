@@ -34,7 +34,7 @@ const TaskAnalysis = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch('http://localhost:4000/api/user_schedule_getAll', { credentials: 'include' })
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_getAll`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         setTasks(data);

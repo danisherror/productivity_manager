@@ -70,7 +70,7 @@ export default function CreateScheduleTask() {
         console.log(payload);
 
         try {
-            const response = fetch('http://localhost:4000/api/user_schedule_create', {
+            const response = fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_create`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

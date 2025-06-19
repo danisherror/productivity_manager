@@ -9,7 +9,7 @@ function UserProfile() {
   const [error, setError] = useState(null);      // show error
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/userProfile', {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/userProfile`, {
       method: 'GET',
       credentials: 'include', // important for cookies
     })
