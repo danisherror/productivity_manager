@@ -20,7 +20,7 @@ function App() {
         <Route path="/signin" element={<Signin />} />     {/* Catch-all route */}
         <Route path="/CreateScheduleTask" element={<CreateScheduleTask />} />     {/* Catch-all route */}
          <Route path="/AllScheduleTasks" element={<AllScheduleTasks />} /> 
-         <Route path="/edit-task/:id" element={<EditTask />} /> 
+         <Route path="/EditTask/:id" element={<EditTask />} /> 
       </Routes>
     </Router>
   );
