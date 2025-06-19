@@ -7,8 +7,8 @@ export default function AllTasks() {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [dateFilter, setDateFilter] = useState('');
+    const [sortBy, setSortBy] = useState('');
 
-    // Fetch all tasks from backend
     const fetchTasks = async () => {
         try {
             const res = await fetch('http://localhost:4000/api/user_schedule_getAll', {
@@ -18,7 +18,7 @@ export default function AllTasks() {
             const data = await res.json();
             if (res.ok) {
                 setTasks(data);
-                setFilteredTasks(data); // Set initial
+                setFilteredTasks(data);
             } else {
                 setError('Failed to fetch tasks');
             }
@@ -27,36 +27,41 @@ export default function AllTasks() {
         }
     };
 
-    // Filter logic
     const applyFilters = (taskList, date, search) => {
         const terms = search
             .split(',')
             .map(t => t.trim().toLowerCase())
             .filter(Boolean);
 
-        return taskList.filter(task => {
+        let filtered = taskList.filter(task => {
             const matchesDate = !date || new Date(task.startTime).toISOString().split('T')[0] === date;
-
-            const matchesSearch = terms.length === 0 || terms.some(term => {
-                return (
-                    task.taskName?.toLowerCase().includes(term) ||
-                    task.category?.toLowerCase().includes(term) ||
-                    task.description?.toLowerCase().includes(term) ||
-                    (task.tags || []).some(tag => tag.toLowerCase().includes(term))
-                );
-            });
-
+            const matchesSearch = terms.length === 0 || terms.some(term =>
+                task.taskName?.toLowerCase().includes(term) ||
+                task.category?.toLowerCase().includes(term) ||
+                task.description?.toLowerCase().includes(term) ||
+                (task.tags || []).some(tag => tag.toLowerCase().includes(term))
+            );
             return matchesDate && matchesSearch;
         });
+
+        if (sortBy === 'startAsc') {
+            filtered.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+        } else if (sortBy === 'startDesc') {
+            filtered.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+        } else if (sortBy === 'endAsc') {
+            filtered.sort((a, b) => new Date(a.endTime) - new Date(b.endTime));
+        } else if (sortBy === 'endDesc') {
+            filtered.sort((a, b) => new Date(b.endTime) - new Date(a.endTime));
+        }
+
+        return filtered;
     };
 
-    // Re-filter whenever tasks/searchTerm/date changes
     useEffect(() => {
         const filtered = applyFilters(tasks, dateFilter, searchTerm);
         setFilteredTasks(filtered);
-    }, [searchTerm, dateFilter, tasks]);
+    }, [searchTerm, dateFilter, sortBy, tasks]);
 
-    // Delete task by ID
     const deleteTask = async (id) => {
         if (!window.confirm('Are you sure you want to delete this task?')) return;
         try {
@@ -107,9 +112,22 @@ export default function AllTasks() {
                 <small style={{ color: '#666' }}>
                     Tip: Use commas to search multiple terms (e.g. "sleep, urgent")
                 </small>
+                <br /><br />
+                <label>
+                    Sort by:&nbsp;
+                    <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                        <option value="">None</option>
+                        <option value="startAsc">Start Time ↑</option>
+                        <option value="startDesc">Start Time ↓</option>
+                        <option value="endAsc">End Time ↑</option>
+                        <option value="endDesc">End Time ↓</option>
+                    </select>
+                </label>
             </div>
 
-            {filteredTasks.length === 0 ? <p>No tasks found.</p> : (
+            {filteredTasks.length === 0 ? (
+                <p>No tasks found.</p>
+            ) : (
                 <table border="1" cellPadding="10" width="100%">
                     <thead>
                         <tr>
