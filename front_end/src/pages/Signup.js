@@ -28,8 +28,11 @@ function Signup() {
 
   const handleFormChange = (event) => {
     const { name, value } = event.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value.trimStart() }));
-    setErrors({ ...errors, [name]: '' });
+    const cleanedValue =
+      name === 'username' ? value.replace(/\s+/g, '') : value.trimStart();
+
+    setFormData((prevData) => ({ ...prevData, [name]: cleanedValue }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
   };
 
   const handleSubmit = async (event) => {
@@ -37,11 +40,21 @@ function Signup() {
     const { name, username, email, password } = formData;
 
     const newErrors = {};
+    if (name.length < 4) {
+      newErrors.name = 'Name must be at least 4 characters long.';
+    }
+
+    if (username.length < 4) {
+      newErrors.username = 'Username must be at least 4 characters long.';
+    }
+
     if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = 'Please enter a valid email address.';
     }
+
     if (!isStrongPassword(password)) {
-      newErrors.password = 'Password must be 8-20 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character.';
+      newErrors.password =
+        'Password must be 8–20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -51,12 +64,15 @@ function Signup() {
 
     try {
       setIsSubmitting(true);
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, {
-        username: username.trim(),
-        name: name.trim(),
-        email: email.trim(),
-        password,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/signup`,
+        {
+          username: username.trim(),
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        }
+      );
 
       if (response.status === 200 || response.status === 201) {
         alert('Registered successfully!');
@@ -79,58 +95,81 @@ function Signup() {
     <div>
       <h2>Sign Up to eReside</h2>
       <form onSubmit={handleSubmit}>
+        {/* Name */}
         <div>
           <label>Name</label>
           <input
             type="text"
             name="name"
+            autoComplete="off"
             value={formData.name}
             onChange={handleFormChange}
             required
             placeholder="Enter your full name"
+            disabled={isSubmitting}
           />
+          {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
         </div>
 
+        {/* Username */}
         <div>
           <label>Username</label>
           <input
             type="text"
             name="username"
+            autoComplete="off"
             value={formData.username}
             onChange={handleFormChange}
             required
             placeholder="Enter your unique username"
+            disabled={isSubmitting}
           />
+          {errors.username && <p style={{ color: 'red' }}>{errors.username}</p>}
         </div>
 
+        {/* Email */}
         <div>
           <label>Email</label>
           <input
             type="email"
             name="email"
+            autoComplete="off"
             value={formData.email}
             onChange={handleFormChange}
             required
             placeholder="Enter your email"
+            disabled={isSubmitting}
           />
           {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
         </div>
 
+        {/* Password */}
         <div>
           <label>Password</label>
           <div style={{ position: 'relative' }}>
             <input
               type={showPassword ? 'text' : 'password'}
               name="password"
+              autoComplete="off"
               value={formData.password}
               onChange={handleFormChange}
               required
               placeholder="Enter your password"
+              disabled={isSubmitting}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              style={{ position: 'absolute', right: 10, top: '30%' }}
+              disabled={isSubmitting}
+              style={{
+                position: 'absolute',
+                right: 10,
+                top: '30%',
+                background: 'none',
+                border: 'none',
+                color: 'blue',
+                cursor: 'pointer',
+              }}
             >
               {showPassword ? 'Hide' : 'Show'}
             </button>
@@ -138,10 +177,12 @@ function Signup() {
           {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
         </div>
 
+        {/* Submit Button */}
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Creating account...' : 'Create account'}
         </button>
 
+        {/* Redirect to Login */}
         <div>
           <p>
             Already have an account? <Link to="/signin">Sign in</Link>
