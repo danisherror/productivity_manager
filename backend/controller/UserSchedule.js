@@ -15,7 +15,6 @@ exports.create = async (req, res) => {
       mood,
       energyLevel
     } = req.body;
-    console.log("asd")
     const userId=req.user._id
 
     // Validate start and end time
