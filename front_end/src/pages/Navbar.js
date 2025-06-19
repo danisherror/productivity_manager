@@ -69,6 +69,7 @@ const Navbar = () => {
           <Link to="/profile" style={linkStyle('/profile')}>Profile</Link>
           <Link to="/CreateScheduleTask" style={linkStyle('/CreateScheduleTask')}>Create Task</Link>
           <Link to="/AllScheduleTasks" style={linkStyle('/AllScheduleTasks')}>All Tasks</Link>
+          <Link to="/analysis" style={linkStyle('/analysis')}>Analysis</Link>
           <button onClick={handleLogout} style={{ marginLeft: '20px' }}>Logout</button>
         </>
       ) : (

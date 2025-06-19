@@ -9,6 +9,7 @@ import CreateScheduleTask from './pages/CreateScheduleTask';
 import AllScheduleTasks from './pages/AllScheduleTasks';
 import EditTask from './pages/EditTask';
 import Navbar from './pages/Navbar';
+import TaskAnalysis from './pages/TaskAnalysis';
 function App() {
   return (
     <Router>
@@ -21,6 +22,7 @@ function App() {
         <Route path="/CreateScheduleTask" element={<CreateScheduleTask />} />     {/* Catch-all route */}
          <Route path="/AllScheduleTasks" element={<AllScheduleTasks />} /> 
          <Route path="/EditTask/:id" element={<EditTask />} /> 
+         <Route path="/analysis/" element={<TaskAnalysis />} /> 
       </Routes>
     </Router>
   );
