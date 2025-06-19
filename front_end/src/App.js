@@ -8,9 +8,11 @@ import Signin from './pages/Signin';
 import CreateScheduleTask from './pages/CreateScheduleTask';
 import AllScheduleTasks from './pages/AllScheduleTasks';
 import EditTask from './pages/EditTask';
+import Navbar from './pages/Navbar';
 function App() {
   return (
     <Router>
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />         {/* Home page */}
         <Route path="/signup" element={<Signup />} />   {/* About page */}

@@ -7,4 +7,7 @@ router.route('/signup').post(signup)
 router.route('/signin').post(signin)
 router.route('/logout').post(logout)
 router.route('/userProfile').get(isLoggedIn,userProfile)
+router.get('/me', isLoggedIn, (req, res) => {
+  res.status(200).json({ user: req.user });
+});
 module.exports=router;
