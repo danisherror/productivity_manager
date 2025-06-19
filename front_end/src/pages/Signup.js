@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
+function isStrongPassword(password) {
+  const minLength = password.length >= 8;
+  const maxLength = password.length <= 20;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*()_\+\-=\[\]{}|;:,.<>?]/.test(password);
+
+  return maxLength && minLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
+}
+
 function Signup() {
   const [formData, setFormData] = useState({
     name: '',
@@ -26,8 +37,10 @@ function Signup() {
       return;
     }
 
-    if (password.length < 6) {
-      alert('Password must be at least 6 characters long.');
+   
+    if(!isStrongPassword(password))
+    {
+      alert('Password must have: \natleast one special character !@#$%^&*()_+-=[]{}|;:,.<>?\none digit\none upper case character\none lower case character\nand of length greater than 7 and less than 21');
       return;
     }
 
