@@ -1,76 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import {
-  PieChart, Pie, Cell,
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend
+  BarChart, Bar, XAxis, YAxis, Tooltip, Legend,
+  PieChart, Pie, Cell
 } from 'recharts';
 
 export default function TaskAnalysis() {
   const [tasks, setTasks] = useState([]);
-  const [selectedDate, setSelectedDate] = useState('');
   const [error, setError] = useState(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
     fetch('http://localhost:4000/api/user_schedule_getAll', {
-      credentials: 'include',
+      credentials: 'include'
     })
       .then(res => res.json())
       .then(data => setTasks(data))
-      .catch(err => setError('Failed to fetch task data.'));
+      .catch(() => setError('Failed to fetch task data.'));
   }, []);
 
-  const getDuration = (start, end) => {
-    return (new Date(end) - new Date(start)) / (1000 * 60); // minutes
+  const getDuration = (start, end) =>
+    (new Date(end) - new Date(start)) / (1000 * 60); // minutes
+
+  const isWithinRange = (date, from, to) => {
+    const d = new Date(date);
+    return (!from || d >= new Date(from)) && (!to || d <= new Date(to));
   };
 
-  // ========== All-Time Category Breakdown ==========
-  const categorySummary = {};
-  tasks.forEach(task => {
-    const duration = getDuration(task.startTime, task.endTime);
-    if (categorySummary[task.category]) {
-      categorySummary[task.category] += duration;
-    } else {
-      categorySummary[task.category] = duration;
-    }
-  });
-  const totalChartData = Object.entries(categorySummary).map(([name, minutes]) => ({
-    name,
-    minutes: Math.round(minutes)
-  }));
+  const filteredTasks = tasks.filter(task =>
+    isWithinRange(task.startTime, startDate, endDate)
+  );
 
-  // ========== Daily Category Breakdown ==========
-  const filteredTasks = selectedDate
-    ? tasks.filter(task =>
-        new Date(task.startTime).toISOString().slice(0, 10) === selectedDate
-      )
-    : [];
-
-  const dailyCategorySummary = {};
-  filteredTasks.forEach(task => {
-    const duration = getDuration(task.startTime, task.endTime);
-    if (dailyCategorySummary[task.category]) {
-      dailyCategorySummary[task.category] += duration;
-    } else {
-      dailyCategorySummary[task.category] = duration;
-    }
-  });
-
-  const dailyChartData = Object.entries(dailyCategorySummary).map(([name, minutes]) => ({
-    name,
-    minutes: Math.round(minutes)
-  }));
+  const summarizeData = (taskList) => {
+    const map = {};
+    taskList.forEach(task => {
+      const duration = getDuration(task.startTime, task.endTime);
+      if (map[task.category]) map[task.category] += duration;
+      else map[task.category] = duration;
+    });
+    return Object.entries(map).map(([name, minutes]) => ({
+      name,
+      minutes: Math.round(minutes)
+    }));
+  };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28BF6', '#F67280'];
+  const chartData = summarizeData(filteredTasks);
 
   return (
     <div style={{ maxWidth: 900, margin: 'auto' }}>
-      <h2>Task Time Analysis</h2>
+      <h2>Task Analysis</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* All Time Analysis */}
-      <h3>All-Time Analysis (Time Spent by Category)</h3>
-      {totalChartData.length === 0 ? <p>No data available.</p> : (
+      {/* Filter Section */}
+      <div style={{ marginBottom: 20 }}>
+        <label>Start Date: </label>
+        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+        <span style={{ margin: '0 10px' }}></span>
+        <label>End Date: </label>
+        <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+      </div>
+
+      {/* Charts */}
+      {chartData.length === 0 ? (
+        <p>No task data found in selected date range.</p>
+      ) : (
         <>
-          <BarChart width={700} height={300} data={totalChartData}>
+          <BarChart width={700} height={300} data={chartData}>
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
@@ -79,43 +75,16 @@ export default function TaskAnalysis() {
           </BarChart>
 
           <PieChart width={400} height={300}>
-            <Pie data={totalChartData} dataKey="minutes" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-              {totalChartData.map((entry, index) => (
-                <Cell key={index} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </>
-      )}
-
-      <hr />
-
-      {/* Daily Analysis */}
-      <h3>Daily Analysis</h3>
-      <label>Select a Date: </label>
-      <input
-        type="date"
-        value={selectedDate}
-        onChange={e => setSelectedDate(e.target.value)}
-        style={{ marginBottom: '20px' }}
-      />
-
-      {selectedDate && dailyChartData.length === 0 && <p>No tasks found on {selectedDate}.</p>}
-
-      {selectedDate && dailyChartData.length > 0 && (
-        <>
-          <BarChart width={700} height={300} data={dailyChartData}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="minutes" fill="#82ca9d" />
-          </BarChart>
-
-          <PieChart width={400} height={300}>
-            <Pie data={dailyChartData} dataKey="minutes" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-              {dailyChartData.map((entry, index) => (
+            <Pie
+              data={chartData}
+              dataKey="minutes"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              label
+            >
+              {chartData.map((entry, index) => (
                 <Cell key={index} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
