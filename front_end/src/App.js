@@ -7,6 +7,7 @@ import Profile from './pages/Profile';
 import Signin from './pages/Signin';
 import CreateScheduleTask from './pages/CreateScheduleTask';
 import AllScheduleTasks from './pages/AllScheduleTasks';
+import EditTask from './pages/EditTask';
 function App() {
   return (
     <Router>
@@ -17,6 +18,7 @@ function App() {
         <Route path="/signin" element={<Signin />} />     {/* Catch-all route */}
         <Route path="/CreateScheduleTask" element={<CreateScheduleTask />} />     {/* Catch-all route */}
          <Route path="/AllScheduleTasks" element={<AllScheduleTasks />} /> 
+         <Route path="/edit-task/:id" element={<EditTask />} /> 
       </Routes>
     </Router>
   );

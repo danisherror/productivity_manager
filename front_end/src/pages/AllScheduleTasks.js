@@ -1,72 +1,79 @@
+// AllTasks.jsx
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-export default function AllScheduleTasks() {
-  const [tasks, setTasks] = useState([]);
-  const [error, setError] = useState(null);
+export default function AllTasks() {
+    const [tasks, setTasks] = useState([]);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchAllTasks();
-  }, []);
+    const fetchTasks = async () => {
+        try {
+            const res = await fetch('http://localhost:4000/api/user_schedule_getAll', {
+                method: 'GET', 
+                credentials: 'include' });
+            const data = await res.json();
+            if (res.ok) setTasks(data);
+            else setError('Failed to fetch tasks');
+        } catch (err) {
+            setError('Server error');
+        }
+    };
 
-  const fetchAllTasks = async () => {
-    try {
-      const response = await fetch('http://localhost:4000/api/user_schedule_getAll', {
-        method: 'GET',
-        credentials: 'include', // include cookies for auth
-      });
+    const deleteTask = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this task?')) return;
+        try {
+            const res = await fetch(`http://localhost:4000/api/user_schedule_delete/${id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            console.log(res);
+            if (res.status === 200) {
+                setTasks(tasks.filter(task => task._id !== id));
+            } else {
+                const data = await res.data;
+                alert('Delete failed');
+            }
+        } catch (err) {
+            alert('Server error');
+            console.log(err);
+        }
+    };
 
-      if (!response.ok) {
-        const err = await response.json();
-        setError(err.error || 'Failed to fetch tasks');
-        return;
-      }
+    useEffect(() => {
+        fetchTasks();
+    }, []);
 
-      const data = await response.json();
-      setTasks(data);
-    } catch (err) {
-      setError('Server error. Please try again.');
-      console.error(err);
-    }
-  };
-
-  return (
-    <div style={{ maxWidth: 800, margin: 'auto' }}>
-      <h2>User Schedule Tasks</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {tasks.length === 0 ? (
-        <p>No tasks found.</p>
-      ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f2f2f2' }}>
-              <th>Task Name</th>
-              <th>Category</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Duration</th>
-              <th>Completed</th>
-              <th>Productivity</th>
-              <th>Mood</th>
-              <th>Energy</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map(task => (
-              <tr key={task._id}>
-                <td>{task.taskName}</td>
-                <td>{task.category}</td>
-                <td>{new Date(task.startTime).toLocaleString()}</td>
-                <td>{new Date(task.endTime).toLocaleString()}</td>
-                <td>{task.duration}</td>
-                <td>{task.isCompleted ? '✅' : '❌'}</td>
-                <td>{task.productivityScore ?? '-'}</td>
-                <td>{task.mood}</td>
-                <td>{task.energyLevel}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
-  );
+    return (
+        <div style={{ maxWidth: 800, margin: 'auto' }}>
+            <h2>All Scheduled Tasks</h2>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {tasks.length === 0 ? <p>No tasks found.</p> : (
+                <table border="1" cellPadding="10" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Category</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tasks.map(task => (
+                            <tr key={task._id}>
+                                <td>{task.taskName}</td>
+                                <td>{task.category}</td>
+                                <td>{new Date(task.startTime).toLocaleString()}</td>
+                                <td>{new Date(task.endTime).toLocaleString()}</td>
+                                <td>
+                                    <Link to={`/edit-task/${task._id}`}>Edit</Link> |{' '}
+                                    <button onClick={() => deleteTask(task._id)}>Delete</button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
+    );
 }
