@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 // Middleware to check if user is signed in and inject user info into req.user
 exports.isLoggedIn = BigPromise(async (req, res, next) => {
   const token = req.cookies.token;
-
+  console.log("asdasdd");
   if (!token) {
     return res.status(403).json({ message: "Token is missing" });
   }

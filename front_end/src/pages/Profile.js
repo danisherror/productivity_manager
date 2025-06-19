@@ -1,6 +1,7 @@
 // src/pages/UserProfile.js
 
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function UserProfile() {
   const [user, setUser] = useState(null);        // store user data
@@ -39,6 +40,10 @@ function UserProfile() {
       <p><strong>Name:</strong> {user.name}</p>
       <p><strong>Username:</strong> {user.username}</p>
       <p><strong>Email:</strong> {user.email}</p>
+      <p>
+        <Link to="/CreateScheduleTask" style={{ marginRight: '1rem' }}>create task</Link>
+        <Link to="/AllScheduleTasks"style={{ marginRight: '1rem' }}>see all task</Link>
+      </p>
     </div>
   );
 }

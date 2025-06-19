@@ -15,7 +15,8 @@ app.use(cors({
 }));
 
 const user=require('./Routes/users')
-
+const userSchedule = require('./Routes/UserSchedule')
 app.use("/api",user)
+app.use("/api",userSchedule)
 
 module.exports=app;
