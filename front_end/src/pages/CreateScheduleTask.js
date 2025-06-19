@@ -8,7 +8,7 @@ export default function CreateScheduleTask() {
         tags: '',
         startTime: '',
         endTime: '',
-        isCompleted: false,
+        isCompleted: true,
         productivityScore: '',
         mood: 'Neutral',
         energyLevel: 5,
@@ -50,7 +50,7 @@ export default function CreateScheduleTask() {
             mood,
         } = formData;
 
-        const tags = tagsArray;
+        const tags = category;
         const productivityScore = formData.productivityScore ? Number(formData.productivityScore) : null;
         const energyLevel = formData.energyLevel ? Number(formData.energyLevel) : 5;
 
@@ -159,7 +159,7 @@ export default function CreateScheduleTask() {
                 </label>
                 <br /><br />
 
-                <label>
+                {/* <label>
                     Tags (comma separated):<br />
                     <input
                         type="text"
@@ -170,7 +170,7 @@ export default function CreateScheduleTask() {
                         style={{ width: '100%' }}
                     />
                 </label>
-                <br /><br />
+                <br /><br /> */}
 
                 <label>
                     Start Time*:<br />
@@ -198,7 +198,7 @@ export default function CreateScheduleTask() {
                 </label>
                 <br /><br />
 
-                <label>
+                {/* <label>
                     Completed:<br />
                     <input
                         type="checkbox"
@@ -207,7 +207,7 @@ export default function CreateScheduleTask() {
                         onChange={handleChange}
                     />
                 </label>
-                <br /><br />
+                <br /><br /> */}
 
                 <label>
                     Productivity Score (0-10):<br />
@@ -223,7 +223,7 @@ export default function CreateScheduleTask() {
                 </label>
                 <br /><br />
 
-                <label>
+                {/* <label>
                     Mood:<br />
                     <select name="mood" value={formData.mood} onChange={handleChange} style={{ width: '100%' }}>
                         <option value="Happy">Happy</option>
@@ -248,7 +248,7 @@ export default function CreateScheduleTask() {
                         style={{ width: '100%' }}
                     />
                 </label>
-                <br /><br />
+                <br /><br /> */}
 
                 <button type="submit">Create Task</button>
             </form>

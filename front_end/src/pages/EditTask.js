@@ -45,14 +45,14 @@ export default function EditTask() {
             isCompleted,
             mood,
         } = formData;
-
+        const tags1=category;
         const productivityScore = formData.productivityScore ? Number(formData.productivityScore) : null;
         const energyLevel = formData.energyLevel ? Number(formData.energyLevel) : 5;
          const payload = {
             taskName,
             description,
             category,
-            tags,
+            tags1,
             startTime,
             endTime,
             isCompleted,
@@ -97,8 +97,8 @@ export default function EditTask() {
         <label>Category:<br />
           <input name="category" value={formData.category} onChange={handleChange} required style={{ width: '100%' }} /></label><br /><br />
 
-        <label>Tags (comma separated):<br />
-          <input name="tags" value={formData.tags} onChange={handleChange} style={{ width: '100%' }} /></label><br /><br />
+        {/* <label>Tags (comma separated):<br />
+          <input name="tags" value={formData.tags} onChange={handleChange} style={{ width: '100%' }} /></label><br /><br /> */}
 
         <label>Start Time:<br />
           <input type="datetime-local" name="startTime" value={formData.startTime.slice(0, 16)} onChange={handleChange} required style={{ width: '100%' }} /></label><br /><br />
@@ -106,13 +106,14 @@ export default function EditTask() {
         <label>End Time:<br />
           <input type="datetime-local" name="endTime" value={formData.endTime.slice(0, 16)} onChange={handleChange} required style={{ width: '100%' }} /></label><br /><br />
 
-        <label>Completed:
-          <input type="checkbox" name="isCompleted" checked={formData.isCompleted} onChange={handleChange} /></label><br /><br />
+        {/* <label>Completed:
+          <input type="checkbox" name="isCompleted" checked={formData.isCompleted} onChange={handleChange} />
+          </label><br /><br /> */}
 
         <label>Productivity Score:<br />
           <input name="productivityScore" type="number" value={formData.productivityScore} onChange={handleChange} style={{ width: '100%' }} /></label><br /><br />
 
-        <label>Mood:<br />
+        {/* <label>Mood:<br />
           <select name="mood" value={formData.mood} onChange={handleChange} style={{ width: '100%' }}>
             <option value="Happy">Happy</option>
             <option value="Neutral">Neutral</option>
@@ -123,7 +124,8 @@ export default function EditTask() {
           </select></label><br /><br />
 
         <label>Energy Level:<br />
-          <input name="energyLevel" type="number" value={formData.energyLevel} min="1" max="10" onChange={handleChange} style={{ width: '100%' }} /></label><br /><br />
+          <input name="energyLevel" type="number" value={formData.energyLevel} min="1" max="10" onChange={handleChange} style={{ width: '100%' }} />
+          </label><br /><br /> */}
 
         <button type="submit">Update Task</button>
       </form>

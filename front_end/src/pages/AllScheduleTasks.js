@@ -34,15 +34,29 @@ export default function AllTasks() {
             .filter(Boolean);
 
         let filtered = taskList.filter(task => {
-            const matchesDate = !date || new Date(task.startTime).toISOString().split('T')[0] === date;
-            const matchesSearch = terms.length === 0 || terms.some(term =>
-                task.taskName?.toLowerCase().includes(term) ||
-                task.category?.toLowerCase().includes(term) ||
-                task.description?.toLowerCase().includes(term) ||
-                (task.tags || []).some(tag => tag.toLowerCase().includes(term))
-            );
-            return matchesDate && matchesSearch;
-        });
+        const taskStart = new Date(task.startTime);
+        const taskEnd = new Date(task.endTime);
+
+        let matchesDate = true;
+        if (date) {
+            const selected = new Date(date);
+            // Compare only dates (ignoring time)
+            selected.setHours(0, 0, 0, 0);
+            taskStart.setHours(0, 0, 0, 0);
+            taskEnd.setHours(0, 0, 0, 0);
+
+            matchesDate = selected >= taskStart && selected <= taskEnd;
+        }
+
+        const matchesSearch = terms.length === 0 || terms.some(term =>
+            task.taskName?.toLowerCase().includes(term) ||
+            task.category?.toLowerCase().includes(term) ||
+            task.description?.toLowerCase().includes(term) ||
+            (task.tags || []).some(tag => tag.toLowerCase().includes(term))
+        );
+
+        return matchesDate && matchesSearch;
+    });
 
         if (sortBy === 'startAsc') {
             filtered.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
@@ -133,8 +147,9 @@ export default function AllTasks() {
                         <tr>
                             <th>Task</th>
                             <th>Category</th>
-                            <th>Tags</th>
+                            {/* <th>Tags</th> */}
                             <th>Description</th>
+                            <th>Dura in mins</th>
                             <th>Start</th>
                             <th>End</th>
                             <th>Actions</th>
@@ -145,8 +160,9 @@ export default function AllTasks() {
                             <tr key={task._id}>
                                 <td>{task.taskName}</td>
                                 <td>{task.category}</td>
-                                <td>{(task.tags || []).join(', ')}</td>
+                                {/* <td>{(task.tags || []).join(', ')}</td> */}
                                 <td>{task.description}</td>
+                                <td>{task.duration}</td>
                                 <td>{new Date(task.startTime).toLocaleString()}</td>
                                 <td>{new Date(task.endTime).toLocaleString()}</td>
                                 <td>
