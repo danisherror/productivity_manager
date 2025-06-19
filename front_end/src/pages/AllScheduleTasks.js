@@ -5,8 +5,7 @@ export default function AllTasks() {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedTag, setSelectedTag] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
 
   const fetchTasks = async () => {
@@ -40,7 +39,7 @@ export default function AllTasks() {
       if (res.ok) {
         const updated = tasks.filter(task => task._id !== id);
         setTasks(updated);
-        setFilteredTasks(applyFilters(updated, selectedDate, selectedCategory, selectedTag));
+        setFilteredTasks(applyFilters(updated, selectedDate, searchTerm));
       } else {
         const data = await res.json();
         alert(data.error || 'Delete failed');
@@ -51,30 +50,32 @@ export default function AllTasks() {
     }
   };
 
-  const applyFilters = (taskList, date, category, tag) => {
+  const applyFilters = (taskList, date, search) => {
     return taskList.filter(task => {
       const matchesDate = !date || new Date(task.startTime).toISOString().split('T')[0] === date;
-      const matchesCategory = !category || task.category === category;
-      const matchesTag = !tag || (task.tags && task.tags.includes(tag));
-      return matchesDate && matchesCategory && matchesTag;
+
+      const lowerSearch = search.toLowerCase();
+      const matchesSearch =
+        !search ||
+        task.taskName?.toLowerCase().includes(lowerSearch) ||
+        task.category?.toLowerCase().includes(lowerSearch) ||
+        task.description?.toLowerCase().includes(lowerSearch) ||
+        (task.tags || []).some(tag => tag.toLowerCase().includes(lowerSearch));
+
+      return matchesDate && matchesSearch;
     });
   };
 
   const handleFilterChange = () => {
-    const filtered = applyFilters(tasks, selectedDate, selectedCategory, selectedTag);
+    const filtered = applyFilters(tasks, selectedDate, searchTerm);
     setFilteredTasks(filtered);
   };
 
   const resetFilters = () => {
     setSelectedDate('');
-    setSelectedCategory('');
-    setSelectedTag('');
+    setSearchTerm('');
     setFilteredTasks(tasks);
   };
-
-  // Extract unique categories and tags for dropdowns
-  const uniqueCategories = [...new Set(tasks.map(task => task.category).filter(Boolean))];
-  const uniqueTags = [...new Set(tasks.flatMap(task => task.tags || []).filter(Boolean))];
 
   useEffect(() => {
     fetchTasks();
@@ -82,15 +83,21 @@ export default function AllTasks() {
 
   useEffect(() => {
     handleFilterChange();
-  }, [selectedDate, selectedCategory, selectedTag]);
+  }, [selectedDate, searchTerm]);
 
   return (
     <div style={{ maxWidth: 900, margin: 'auto' }}>
       <h2>All Scheduled Tasks</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Filters */}
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '20px', alignItems: 'center' }}>
+      {/* Filter Controls */}
+      <div style={{
+        marginBottom: '20px',
+        display: 'flex',
+        gap: '20px',
+        alignItems: 'center',
+        flexWrap: 'wrap'
+      }}>
         <div>
           <label>Date:{' '}
             <input
@@ -101,29 +108,20 @@ export default function AllTasks() {
           </label>
         </div>
         <div>
-          <label>Category:{' '}
-            <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
-              <option value="">All</option>
-              {uniqueCategories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div>
-          <label>Tag:{' '}
-            <select value={selectedTag} onChange={e => setSelectedTag(e.target.value)}>
-              <option value="">All</option>
-              {uniqueTags.map(tag => (
-                <option key={tag} value={tag}>{tag}</option>
-              ))}
-            </select>
+          <label>Search:{' '}
+            <input
+              type="text"
+              placeholder="Search category, tag, title, description..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{ width: '280px' }}
+            />
           </label>
         </div>
         <button onClick={resetFilters}>Reset</button>
       </div>
 
-      {/* Table */}
+      {/* Table Display */}
       {filteredTasks.length === 0 ? (
         <p>No tasks found.</p>
       ) : (
