@@ -60,6 +60,28 @@ exports.getAll = async (req, res) => {
   }
 };
 
+exports.getUserScheduleHelper = async (req, res) => {
+  try {
+    const allTasks = await UserSchedule.find({ user: req.user._id }).sort({ startTime: 1 });
+
+    const taskNameSet = new Set();
+    const categorySet = new Set();
+
+    for (let i = 0; i < allTasks.length; i++) {
+      if (allTasks[i].taskName) taskNameSet.add(allTasks[i].taskName);
+      if (allTasks[i].category) categorySet.add(allTasks[i].category);
+    }
+
+    const taskNames = Array.from(taskNameSet);
+    const categories = Array.from(categorySet);
+
+    res.status(200).json({ taskNames, categories });
+  } catch (err) {
+    console.error('Error fetching tasks:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 exports.getById = async (req, res) => {
   try {
     const task = await UserSchedule.findOne({ _id: req.params.id, user: req.user._id });
