@@ -11,8 +11,6 @@ export default function EditTask() {
   const [loadingHelper, setHelperLoading] = useState(true);
   const [loadingInfo, setInfoLoading] = useState(true);
 
-
-  // Fetch task data by ID
   useEffect(() => {
     const fetchTask = async () => {
       setInfoLoading(true);
@@ -26,15 +24,13 @@ export default function EditTask() {
         else setError(data.error || 'Could not fetch task');
       } catch (err) {
         setError('Server error');
-      }
-      finally {
+      } finally {
         setInfoLoading(false);
       }
     };
     fetchTask();
   }, [id]);
 
-  // Fetch helper data for task names and categories
   useEffect(() => {
     const fetchHelperData = async () => {
       setHelperLoading(true);
@@ -47,8 +43,7 @@ export default function EditTask() {
         setCategoryOptions(data.categories || []);
       } catch (err) {
         console.error('Failed to fetch helper data');
-      }
-      finally {
+      } finally {
         setHelperLoading(false);
       }
     };
@@ -65,34 +60,44 @@ export default function EditTask() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setError(null);
+
+    const {
+      taskName,
+      description,
+      category,
+      startTime,
+      endTime,
+      isCompleted,
+      mood,
+      productivityScore,
+      energyLevel,
+    } = formData;
+
+    if (!taskName || !category || !startTime || !endTime) {
+      setError('Please fill all required fields.');
+      return;
+    }
+
+    if (new Date(endTime) <= new Date(startTime)) {
+      setError('End Time must be after Start Time.');
+      return;
+    }
+
+    const payload = {
+      taskName,
+      description,
+      category,
+      tags: category,
+      startTime,
+      endTime,
+      isCompleted,
+      productivityScore: productivityScore ? Number(productivityScore) : null,
+      mood,
+      energyLevel: energyLevel ? Number(energyLevel) : 5,
+    };
+
     try {
-      const {
-        taskName,
-        description,
-        category,
-        startTime,
-        endTime,
-        isCompleted,
-        mood,
-      } = formData;
-
-      const tags1 = category;
-      const productivityScore = formData.productivityScore ? Number(formData.productivityScore) : null;
-      const energyLevel = formData.energyLevel ? Number(formData.energyLevel) : 5;
-
-      const payload = {
-        taskName,
-        description,
-        category,
-        tags: tags1,
-        startTime,
-        endTime,
-        isCompleted,
-        productivityScore,
-        mood,
-        energyLevel
-      };
-
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_update/${id}`, {
         method: 'PUT',
         credentials: 'include',
@@ -113,13 +118,13 @@ export default function EditTask() {
   };
 
   if (!formData) {
-  return (
-    <div className="flex justify-center items-center py-10">
-      <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
-      <span className="ml-3 text-blue-600 text-lg">Loading task data...</span>
-    </div>
-  );
-}
+    return (
+      <div className="flex justify-center items-center py-10">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
+        <span className="ml-3 text-blue-600 text-lg">Loading task data...</span>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: 600, margin: 'auto' }}>
@@ -128,7 +133,7 @@ export default function EditTask() {
       {(loadingHelper || loadingInfo) ? (
         <div className="flex justify-center items-center py-10">
           <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
-          <span className="ml-3 text-blue-600 text-lg">Loading tasks...</span>
+          <span className="ml-3 text-blue-600 text-lg">Loading helper data...</span>
         </div>
       ) : (
         <form onSubmit={handleSubmit}>
@@ -187,7 +192,7 @@ export default function EditTask() {
             <input
               type="datetime-local"
               name="startTime"
-              value={formData.startTime.slice(0, 16)}
+              value={new Date(formData.startTime).toISOString().slice(0, 16)}
               onChange={handleChange}
               required
               style={{ width: '100%' }}
@@ -199,7 +204,7 @@ export default function EditTask() {
             <input
               type="datetime-local"
               name="endTime"
-              value={formData.endTime.slice(0, 16)}
+              value={new Date(formData.endTime).toISOString().slice(0, 16)}
               onChange={handleChange}
               required
               style={{ width: '100%' }}
@@ -219,7 +224,11 @@ export default function EditTask() {
             />
           </label><br /><br />
 
+          {/* Submit */}
           <button type="submit">Update Task</button>
+          <button type="button" onClick={() => navigate('/AllScheduleTasks')} style={{ marginLeft: 10 }}>
+            Cancel
+          </button>
         </form>
       )}
     </div>
