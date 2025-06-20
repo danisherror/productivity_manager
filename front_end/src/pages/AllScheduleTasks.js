@@ -9,7 +9,7 @@ export default function AllTasks() {
   const [dateFilter, setDateFilter] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const tasksPerPage = 10;
+  const [tasksPerPage, setTasksPerPage] = useState(10); // Dropdown-controlled
 
   const fetchTasks = async () => {
     try {
@@ -75,7 +75,7 @@ export default function AllTasks() {
   useEffect(() => {
     const filtered = applyFilters(tasks, dateFilter, searchTerm);
     setFilteredTasks(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1); // Reset to first page on filter change
   }, [searchTerm, dateFilter, sortBy, tasks]);
 
   const deleteTask = async (id) => {
@@ -147,6 +147,23 @@ export default function AllTasks() {
             <option value="endDesc">End Time ↓</option>
           </select>
         </label>
+        <br /><br />
+        <label>
+          Tasks per page:&nbsp;
+          <select
+            value={tasksPerPage}
+            onChange={(e) => {
+              setTasksPerPage(Number(e.target.value));
+              setCurrentPage(1); // Reset to page 1 on page size change
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+        </label>
       </div>
 
       {currentTasks.length === 0 ? (
@@ -185,9 +202,8 @@ export default function AllTasks() {
 
           {/* Pagination Controls */}
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
-              ⬅ Prev
-            </button>
+            <button onClick={() => goToPage(1)} disabled={currentPage === 1}>⏮ First</button>
+            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>⬅ Prev</button>
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i + 1}
@@ -200,9 +216,8 @@ export default function AllTasks() {
                 {i + 1}
               </button>
             ))}
-            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>
-              Next ➡
-            </button>
+            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>Next ➡</button>
+            <button onClick={() => goToPage(totalPages)} disabled={currentPage === totalPages}>Last ⏭</button>
           </div>
         </>
       )}
