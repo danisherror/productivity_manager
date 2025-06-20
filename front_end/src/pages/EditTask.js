@@ -6,12 +6,15 @@ export default function EditTask() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(null);
   const [error, setError] = useState(null);
+  const [taskNameOptions, setTaskNameOptions] = useState([]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
 
+  // Fetch task data by ID
   useEffect(() => {
     const fetchTask = async () => {
       try {
         const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_getByID/${id}`, {
-            method: 'GET',
+          method: 'GET',
           credentials: 'include',
         });
         const data = await res.json();
@@ -23,6 +26,23 @@ export default function EditTask() {
     };
     fetchTask();
   }, [id]);
+
+  // Fetch helper data for task names and categories
+  useEffect(() => {
+    const fetchHelperData = async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_helper`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        setTaskNameOptions(data.taskNames || []);
+        setCategoryOptions(data.categories || []);
+      } catch (err) {
+        console.error('Failed to fetch helper data');
+      }
+    };
+    fetchHelperData();
+  }, []);
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
@@ -36,30 +56,31 @@ export default function EditTask() {
     e.preventDefault();
     try {
       const {
-            taskName,
-            description,
-            category,
-            tags,
-            startTime,
-            endTime,
-            isCompleted,
-            mood,
-        } = formData;
-        const tags1=category;
-        const productivityScore = formData.productivityScore ? Number(formData.productivityScore) : null;
-        const energyLevel = formData.energyLevel ? Number(formData.energyLevel) : 5;
-         const payload = {
-            taskName,
-            description,
-            category,
-            tags1,
-            startTime,
-            endTime,
-            isCompleted,
-            productivityScore,
-            mood,
-            energyLevel
-        };
+        taskName,
+        description,
+        category,
+        startTime,
+        endTime,
+        isCompleted,
+        mood,
+      } = formData;
+
+      const tags1 = category;
+      const productivityScore = formData.productivityScore ? Number(formData.productivityScore) : null;
+      const energyLevel = formData.energyLevel ? Number(formData.energyLevel) : 5;
+
+      const payload = {
+        taskName,
+        description,
+        category,
+        tags: tags1,
+        startTime,
+        endTime,
+        isCompleted,
+        productivityScore,
+        mood,
+        energyLevel
+      };
 
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_update/${id}`, {
         method: 'PUT',
@@ -68,11 +89,10 @@ export default function EditTask() {
         body: JSON.stringify(payload),
       });
 
-      if (res.ok){
-        alert('edited successfully');
+      if (res.ok) {
+        alert('Edited successfully');
         navigate('/AllScheduleTasks');
-      }
-      else {
+      } else {
         const data = await res.json();
         setError(data.error || 'Update failed');
       }
@@ -88,44 +108,92 @@ export default function EditTask() {
       <h2>Edit Task</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
+
+        {/* Task Name */}
         <label>Task Name:<br />
-          <input name="taskName" value={formData.taskName} onChange={handleChange} required style={{ width: '100%' }} /></label><br /><br />
+          <select
+            value={formData.taskName}
+            onChange={e => setFormData(prev => ({ ...prev, taskName: e.target.value }))}
+            style={{ width: '100%' }}
+          >
+            <option value="">-- Select or enter below --</option>
+            {taskNameOptions.map((name, idx) => (
+              <option key={idx} value={name}>{name}</option>
+            ))}
+          </select>
+          <input
+            type="text"
+            placeholder="Or enter new task name"
+            name="taskName"
+            value={formData.taskName}
+            onChange={handleChange}
+            style={{ width: '100%', marginTop: '4px' }}
+          />
+        </label><br /><br />
 
+        {/* Description */}
         <label>Description:<br />
-          <textarea name="description" value={formData.description} onChange={handleChange} style={{ width: '100%' }} /></label><br /><br />
+          <textarea name="description" value={formData.description} onChange={handleChange} style={{ width: '100%' }} />
+        </label><br /><br />
 
+        {/* Category */}
         <label>Category:<br />
-          <input name="category" value={formData.category} onChange={handleChange} required style={{ width: '100%' }} /></label><br /><br />
+          <select
+            value={formData.category}
+            onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
+            style={{ width: '100%' }}
+          >
+            <option value="">-- Select or enter below --</option>
+            {categoryOptions.map((cat, idx) => (
+              <option key={idx} value={cat}>{cat}</option>
+            ))}
+          </select>
+          <input
+            type="text"
+            placeholder="Or enter new category"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            style={{ width: '100%', marginTop: '4px' }}
+          />
+        </label><br /><br />
 
-        {/* <label>Tags (comma separated):<br />
-          <input name="tags" value={formData.tags} onChange={handleChange} style={{ width: '100%' }} /></label><br /><br /> */}
-
+        {/* Start Time */}
         <label>Start Time:<br />
-          <input type="datetime-local" name="startTime" value={formData.startTime.slice(0, 16)} onChange={handleChange} required style={{ width: '100%' }} /></label><br /><br />
+          <input
+            type="datetime-local"
+            name="startTime"
+            value={formData.startTime.slice(0, 16)}
+            onChange={handleChange}
+            required
+            style={{ width: '100%' }}
+          />
+        </label><br /><br />
 
+        {/* End Time */}
         <label>End Time:<br />
-          <input type="datetime-local" name="endTime" value={formData.endTime.slice(0, 16)} onChange={handleChange} required style={{ width: '100%' }} /></label><br /><br />
+          <input
+            type="datetime-local"
+            name="endTime"
+            value={formData.endTime.slice(0, 16)}
+            onChange={handleChange}
+            required
+            style={{ width: '100%' }}
+          />
+        </label><br /><br />
 
-        {/* <label>Completed:
-          <input type="checkbox" name="isCompleted" checked={formData.isCompleted} onChange={handleChange} />
-          </label><br /><br /> */}
-
+        {/* Productivity Score */}
         <label>Productivity Score:<br />
-          <input name="productivityScore" type="number" value={formData.productivityScore} onChange={handleChange} style={{ width: '100%' }} /></label><br /><br />
-
-        {/* <label>Mood:<br />
-          <select name="mood" value={formData.mood} onChange={handleChange} style={{ width: '100%' }}>
-            <option value="Happy">Happy</option>
-            <option value="Neutral">Neutral</option>
-            <option value="Sad">Sad</option>
-            <option value="Tired">Tired</option>
-            <option value="Motivated">Motivated</option>
-            <option value="Stressed">Stressed</option>
-          </select></label><br /><br />
-
-        <label>Energy Level:<br />
-          <input name="energyLevel" type="number" value={formData.energyLevel} min="1" max="10" onChange={handleChange} style={{ width: '100%' }} />
-          </label><br /><br /> */}
+          <input
+            name="productivityScore"
+            type="number"
+            min="0"
+            max="10"
+            value={formData.productivityScore}
+            onChange={handleChange}
+            style={{ width: '100%' }}
+          />
+        </label><br /><br />
 
         <button type="submit">Update Task</button>
       </form>
