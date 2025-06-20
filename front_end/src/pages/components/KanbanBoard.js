@@ -14,7 +14,6 @@ export default function KanbanBoard({ board }) {
   const [columns, setColumns] = useState(board.columns || []);
   const [newColumnName, setNewColumnName] = useState('');
 
-  // Fetch tasks
   const fetchTasks = async () => {
     setLoading(true);
     try {
@@ -24,7 +23,6 @@ export default function KanbanBoard({ board }) {
       );
       if (res.status === 404) {
         setTasks([]);
-        setLoading(false);
         return;
       }
       const data = await res.json();
@@ -36,7 +34,6 @@ export default function KanbanBoard({ board }) {
     }
   };
 
-  // Fetch updated board with columns
   const fetchBoardColumns = async () => {
     try {
       const res = await fetch(
@@ -54,10 +51,9 @@ export default function KanbanBoard({ board }) {
 
   useEffect(() => {
     fetchTasks();
-    fetchBoardColumns(); // Always fetch fresh board columns on mount
+    fetchBoardColumns();
   }, [board._id]);
 
-  // Add new column (POST)
   const addNewColumn = async () => {
     const trimmedName = newColumnName.trim();
     if (!trimmedName) return;
@@ -68,11 +64,9 @@ export default function KanbanBoard({ board }) {
     }
 
     try {
-      console.log(trimmedName)
-      const res = await api.post(
-        `/kanban_board/${board._id}/columns`,
-        { title: trimmedName }
-      );
+      const res = await api.post(`/kanban_board/${board._id}/columns`, {
+        title: trimmedName,
+      });
 
       if (res.status === 201 || res.status === 200) {
         await fetchBoardColumns();
@@ -86,23 +80,13 @@ export default function KanbanBoard({ board }) {
     }
   };
 
-  // Delete column (DELETE)
   const deleteColumn = async (columnId, columnTitle) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete the column "${columnTitle}"? This will also delete tasks in this column.`
-      )
-    )
-      return;
+    if (!window.confirm(`Are you sure you want to delete the column "${columnTitle}"? This will also delete tasks in this column.`)) return;
 
     try {
-      const res = await api.delete(
-        `/kanban_board/${board._id}/columns/${columnId}`
-      );
-
+      const res = await api.delete(`/kanban_board/${board._id}/columns/${columnId}`);
       if (res.status === 200) {
         await fetchBoardColumns();
-        // Optionally refresh tasks to reflect deleted column tasks removed
         await fetchTasks();
       } else {
         alert('Failed to delete column');
@@ -113,32 +97,53 @@ export default function KanbanBoard({ board }) {
     }
   };
 
-  // Drag handlers...
+  const deleteBoard = async () => {
+    const confirmed = window.confirm(`Are you sure you want to delete the board "${board.title}"? This will delete all columns and tasks in it.`);
+    if (!confirmed) return;
 
-  // Group tasks by current columns state
+    try {
+      const res = await api.delete(`/kanban_board__delete/${board._id}`);
+      if (res.status === 200) {
+        alert('Board deleted successfully');
+        window.location.href = '/kanban'; // or use useNavigate()
+      } else {
+        alert('Failed to delete board');
+      }
+    } catch (err) {
+      console.error('Error deleting board:', err);
+      alert('Error deleting board');
+    }
+  };
+
   const grouped = columns.map((col) => ({
     ...col,
-    items: tasks
-      .filter((t) => t.columnTitle === col.title)
-      .sort((a, b) => a.order - b.order),
+    items: tasks.filter((t) => t.columnTitle === col.title).sort((a, b) => a.order - b.order),
   }));
 
   return (
     <div className="p-4">
       <div className="flex justify-between mb-4 items-center">
         <h2 className="text-xl font-bold">{board.title}</h2>
-        <button
-          onClick={() => {
-            setModalTask(null);
-            setIsCreateMode(true);
-          }}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          + New Task
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => {
+              setModalTask(null);
+              setIsCreateMode(true);
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            + New Task
+          </button>
+
+          <button
+            onClick={deleteBoard}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Delete Board
+          </button>
+        </div>
       </div>
 
-      {/* Add new column input */}
       <div className="mb-4 flex gap-2 items-center">
         <input
           type="text"
@@ -170,26 +175,17 @@ export default function KanbanBoard({ board }) {
                 e.preventDefault();
                 if (!draggedTaskId) return;
 
-                const movingTask = tasks.find(
-                  (t) => t._id.toString() === draggedTaskId
-                );
-                if (!movingTask) return;
-
-                if (movingTask.columnTitle === col.title) {
+                const movingTask = tasks.find((t) => t._id.toString() === draggedTaskId);
+                if (!movingTask || movingTask.columnTitle === col.title) {
                   setDraggedTaskId(null);
                   setDraggedOverColumn(null);
                   return;
                 }
 
-                const updatedTask = {
-                  ...movingTask,
-                  columnTitle: col.title,
-                };
-
                 try {
                   await api.put(
                     `/kanban_task/${board._id}/tasks/${draggedTaskId}`,
-                    updatedTask
+                    { ...movingTask, columnTitle: col.title }
                   );
                   await fetchTasks();
                 } catch (error) {
@@ -199,8 +195,7 @@ export default function KanbanBoard({ board }) {
                 setDraggedTaskId(null);
                 setDraggedOverColumn(null);
               }}
-              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] relative ${draggedOverColumn === col.title ? 'bg-blue-100' : ''
-                }`}
+              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] relative ${draggedOverColumn === col.title ? 'bg-blue-100' : ''}`}
             >
               <h3 className="font-semibold mb-3 flex justify-between items-center">
                 <span>{col.title}</span>
@@ -208,7 +203,6 @@ export default function KanbanBoard({ board }) {
                   onClick={() => deleteColumn(col._id, col.title)}
                   className="text-red-600 hover:text-red-800 text-lg font-bold"
                   title="Delete column"
-                  type="button"
                 >
                   &times;
                 </button>
@@ -228,10 +222,9 @@ export default function KanbanBoard({ board }) {
                   }}
                   className="bg-white p-3 mb-2 rounded shadow cursor-pointer hover:bg-gray-50 relative"
                 >
-                  {/* Delete button */}
                   <button
                     onClick={async (e) => {
-                      e.stopPropagation(); // Prevent modal open
+                      e.stopPropagation();
                       const confirmDelete = window.confirm(`Are you sure you want to delete task "${task.title}"?`);
                       if (!confirmDelete) return;
 
@@ -249,7 +242,6 @@ export default function KanbanBoard({ board }) {
                     &times;
                   </button>
 
-                  {/* Click to open modal */}
                   <div onClick={() => {
                     setModalTask(task);
                     setIsCreateMode(false);
@@ -274,7 +266,7 @@ export default function KanbanBoard({ board }) {
             setModalTask(null);
             setIsCreateMode(false);
             fetchTasks();
-            fetchBoardColumns(); // Refresh columns in case a new column title is involved
+            fetchBoardColumns();
           }}
           columns={columns}
         />
