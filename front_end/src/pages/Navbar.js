@@ -5,8 +5,8 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // state for collapse toggle
 
-  // Check login status using backend cookie-based auth
   useEffect(() => {
     const checkLogin = async () => {
       try {
@@ -47,11 +47,12 @@ const Navbar = () => {
 
   const linkStyle = (path) => ({
     padding: '10px 15px',
-    marginRight: '10px',
+    margin: '5px 0',
     textDecoration: 'none',
     color: location.pathname === path ? '#fff' : '#333',
     backgroundColor: location.pathname === path ? '#007bff' : '#f1f1f1',
     borderRadius: '5px',
+    display: 'block',
   });
 
   return (
@@ -59,24 +60,43 @@ const Navbar = () => {
       padding: '15px',
       backgroundColor: '#eee',
       borderBottom: '1px solid #ccc',
-      marginBottom: '20px',
-      display: 'flex',
-      justifyContent: 'center',
     }}>
-      {isLoggedIn ? (
-        <>
-          <Link to="/" style={linkStyle('/')}>Home</Link>
-          <Link to="/profile" style={linkStyle('/profile')}>Profile</Link>
-          <Link to="/CreateScheduleTask" style={linkStyle('/CreateScheduleTask')}>Create Task</Link>
-          <Link to="/AllScheduleTasks" style={linkStyle('/AllScheduleTasks')}>All Tasks</Link>
-          <Link to="/analysis" style={linkStyle('/analysis')}>Analysis</Link>
-          <button onClick={handleLogout} style={{ marginLeft: '20px' }}>Logout</button>
-        </>
-      ) : (
-        <>
-          <Link to="/signin" style={linkStyle('/signin')}>Sign In</Link>
-          <Link to="/signup" style={linkStyle('/signup')}>Sign Up</Link>
-        </>
+      {/* Hamburger Toggle Button */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ margin: 0 }}>My App</h2>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          style={{
+            fontSize: '20px',
+            padding: '10px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          ☰
+        </button>
+      </div>
+
+      {/* Collapsible links */}
+      {isOpen && (
+        <div style={{ marginTop: '10px' }}>
+          {isLoggedIn ? (
+            <>
+              <Link to="/" style={linkStyle('/')}>Home</Link>
+              <Link to="/profile" style={linkStyle('/profile')}>Profile</Link>
+              <Link to="/CreateScheduleTask" style={linkStyle('/CreateScheduleTask')}>Create Task</Link>
+              <Link to="/AllScheduleTasks" style={linkStyle('/AllScheduleTasks')}>All Tasks</Link>
+              <Link to="/analysis" style={linkStyle('/analysis')}>Analysis</Link>
+              <button onClick={handleLogout} style={{ ...linkStyle(), backgroundColor: '#dc3545', color: '#fff' }}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/signin" style={linkStyle('/signin')}>Sign In</Link>
+              <Link to="/signup" style={linkStyle('/signup')}>Sign Up</Link>
+            </>
+          )}
+        </div>
       )}
     </nav>
   );
