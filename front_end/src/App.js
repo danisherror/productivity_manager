@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
 import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
@@ -10,6 +9,9 @@ import AllScheduleTasks from './pages/AllScheduleTasks';
 import EditTask from './pages/EditTask';
 import Navbar from './pages/Navbar';
 import TaskAnalysis from './pages/TaskAnalysis';
+import KanbanBoardListPage from './pages/KanbanBoardListPage';
+import KanbanBoardPage from './pages/KanbanBoardPage';
+import CreateBoard from './pages/CreateBoard'; 
 function App() {
   return (
     <Router>
@@ -23,6 +25,9 @@ function App() {
          <Route path="/AllScheduleTasks" element={<AllScheduleTasks />} /> 
          <Route path="/EditTask/:id" element={<EditTask />} /> 
          <Route path="/analysis/" element={<TaskAnalysis />} /> 
+         <Route path="/kanban" element={<KanbanBoardListPage />} />
+        <Route path="/kanban/board/:id" element={<KanbanBoardPage />} />
+        <Route path="/kanban/create" element={<CreateBoard />} />
       </Routes>
     </Router>
   );

@@ -46,10 +46,9 @@ const Navbar = () => {
   };
 
   const linkClasses = (path) =>
-    `block px-4 py-2 rounded-md my-1 transition-colors duration-200 ${
-      location.pathname === path
-        ? 'bg-blue-600 text-white'
-        : 'bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white'
+    `block px-4 py-2 rounded-md my-1 transition-colors duration-200 ${location.pathname === path
+      ? 'bg-blue-600 text-white'
+      : 'bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white'
     }`;
 
   return (
@@ -84,6 +83,12 @@ const Navbar = () => {
                 </Link>
                 <Link to="/analysis" className={linkClasses('/analysis')}>
                   Analysis
+                </Link>
+                <Link to="/kanban/create" className={linkClasses('/kanban/create')}>
+                  Create Board
+                </Link>
+                <Link to="/kanban" className={linkClasses('/kanban')}>
+                  Kanban Board
                 </Link>
                 <button
                   onClick={handleLogout}
