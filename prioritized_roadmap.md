@@ -8,8 +8,8 @@ Focus: Make your app more user-friendly, responsive, and error-proof.
 
 #### 🛠️ Must-Haves
 
-* [ ] **Fix any existing bugs** (task filtering, logout, edit inconsistencies).
-* [ ] **Pagination & Search in AllTasks**.
+* [x] **Fix any existing bugs** (task filtering, logout, edit inconsistencies).
+* [x] **Pagination & Search in AllTasks**.
 * [ ] **Add loading indicators** during data fetch.
 * [ ] **Add error boundaries** to catch crashes gracefully.
 * [ ] **Improve layout with a sidebar or collapsible navbar** (especially for mobile).
