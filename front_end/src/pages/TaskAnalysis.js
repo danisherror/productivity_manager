@@ -49,17 +49,17 @@ const TaskAnalysis = () => {
   const getDuration = (s, e) => (new Date(e) - new Date(s)) / (1000 * 60);
 
   const isWithinRange = (date, from, to) => {
-  const d = new Date(date);
+    const d = new Date(date);
 
-  const fromDate = from ? new Date(from) : null;
-  let toDate = to ? new Date(to) : null;
+    const fromDate = from ? new Date(from) : null;
+    let toDate = to ? new Date(to) : null;
 
-  if (fromDate && toDate && fromDate.toDateString() === toDate.toDateString()) {
-    toDate.setHours(23, 59, 59, 999);
-  }
+    if (fromDate && toDate && fromDate.toDateString() === toDate.toDateString()) {
+      toDate.setHours(23, 59, 59, 999);
+    }
 
-  return (!fromDate || d >= fromDate) && (!toDate || d <= toDate);
-};
+    return (!fromDate || d >= fromDate) && (!toDate || d <= toDate);
+  };
 
   const filtered = tasks.filter(t => isWithinRange(t.startTime, startDate, endDate));
 
@@ -129,7 +129,12 @@ const TaskAnalysis = () => {
         </select>
       </div>
 
-      {loading && <div>Loading tasks...</div>}
+      {loading && (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
+          <span className="ml-3 text-blue-600 text-lg">Loading tasks...</span>
+        </div>
+      )}
 
       {error && <div style={{ color: 'red' }}>{error}</div>}
 
