@@ -4,9 +4,8 @@ const KanbanTask = require('../models/kanban_task');
 // Get all tasks for a specific board
 exports.getAll = async (req, res) =>  {
   try{
-    console.log("asdd");
-  const tasks = await KanbanTask.find({ boardId: req.params.boardId, user: req.user._id });
-  res.json(tasks);
+    const tasks = await KanbanTask.find({ boardId: req.params.boardId, user: req.user._id });
+  res.status(200).json(tasks);
   }
   catch (err) {
     console.log(err)

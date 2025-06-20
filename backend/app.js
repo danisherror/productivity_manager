@@ -18,7 +18,7 @@ const user=require('./Routes/users')
 const userSchedule = require('./Routes/UserSchedule')
 const kanbanBoard = require('./Routes/kanbanBoard');
 const kanbanComment = require('./Routes/kanbanComment');
-const kanbanTask = require('./Routes/kanbanComment')
+const kanbanTask = require('./Routes/kanbanTask')
 app.use("/api",user)
 app.use("/api",userSchedule)
 app.use("/api",kanbanBoard)
