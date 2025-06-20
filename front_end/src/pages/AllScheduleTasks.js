@@ -9,9 +9,11 @@ export default function AllTasks() {
     const [dateFilter, setDateFilter] = useState('');
     const [sortBy, setSortBy] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    const [tasksPerPage, setTasksPerPage] = useState(10); // Dropdown-controlled
+    const [tasksPerPage, setTasksPerPage] = useState(10);
+    const [loading, setLoading] = useState(true); // ✅ Loading state
 
     const fetchTasks = async () => {
+        setLoading(true);
         try {
             const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_getAll`, {
                 method: 'GET',
@@ -26,6 +28,8 @@ export default function AllTasks() {
             }
         } catch (err) {
             setError('Server error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -75,7 +79,7 @@ export default function AllTasks() {
     useEffect(() => {
         const filtered = applyFilters(tasks, dateFilter, searchTerm);
         setFilteredTasks(filtered);
-        setCurrentPage(1); // Reset to first page on filter change
+        setCurrentPage(1);
     }, [searchTerm, dateFilter, sortBy, tasks]);
 
     const deleteTask = async (id) => {
@@ -92,7 +96,6 @@ export default function AllTasks() {
             }
         } catch (err) {
             alert('Server error');
-            console.log(err);
         }
     };
 
@@ -100,7 +103,6 @@ export default function AllTasks() {
         fetchTasks();
     }, []);
 
-    // Pagination logic
     const indexOfLastTask = currentPage * tasksPerPage;
     const indexOfFirstTask = indexOfLastTask - tasksPerPage;
     const currentTasks = filteredTasks.slice(indexOfFirstTask, indexOfLastTask);
@@ -154,7 +156,7 @@ export default function AllTasks() {
                         value={tasksPerPage}
                         onChange={(e) => {
                             setTasksPerPage(Number(e.target.value));
-                            setCurrentPage(1); // Reset to page 1 on page size change
+                            setCurrentPage(1);
                         }}
                     >
                         <option value={5}>5</option>
@@ -166,7 +168,12 @@ export default function AllTasks() {
                 </label>
             </div>
 
-            {currentTasks.length === 0 ? (
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
+                    <span className="ml-3 text-blue-600 text-lg">Loading tasks...</span>
+                </div>
+            ) : currentTasks.length === 0 ? (
                 <p>No tasks found.</p>
             ) : (
                 <>
@@ -200,32 +207,28 @@ export default function AllTasks() {
                         </tbody>
                     </table>
 
-                    {/* <div style={{ textAlign: 'center', marginTop: '20px' }}> */}
-                    {/* Pagination Controls with Ellipsis */}
                     <div className="mt-8 flex flex-wrap justify-center items-center gap-2">
                         <button
                             onClick={() => goToPage(1)}
                             disabled={currentPage === 1}
                             className={`px-3 py-1 rounded border text-sm ${currentPage === 1
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
                                 }`}
                         >
                             ⏮ First
                         </button>
-
                         <button
                             onClick={() => goToPage(currentPage - 1)}
                             disabled={currentPage === 1}
                             className={`px-3 py-1 rounded border text-sm ${currentPage === 1
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
                                 }`}
                         >
                             ⬅ Prev
                         </button>
 
-                        {/* Pagination Numbers */}
                         {(() => {
                             const pageButtons = [];
                             const maxVisible = 5;
@@ -260,8 +263,8 @@ export default function AllTasks() {
                                         key={i}
                                         onClick={() => goToPage(i)}
                                         className={`px-3 py-1 rounded border text-sm ${currentPage === i
-                                                ? 'bg-blue-500 text-white font-semibold'
-                                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                                            ? 'bg-blue-500 text-white font-semibold'
+                                            : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
                                             }`}
                                     >
                                         {i}
@@ -293,25 +296,23 @@ export default function AllTasks() {
                             onClick={() => goToPage(currentPage + 1)}
                             disabled={currentPage === totalPages}
                             className={`px-3 py-1 rounded border text-sm ${currentPage === totalPages
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
                                 }`}
                         >
                             Next ➡
                         </button>
-
                         <button
                             onClick={() => goToPage(totalPages)}
                             disabled={currentPage === totalPages}
                             className={`px-3 py-1 rounded border text-sm ${currentPage === totalPages
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
                                 }`}
                         >
                             Last ⏭
                         </button>
                     </div>
-
                 </>
             )}
         </div>

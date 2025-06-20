@@ -18,9 +18,11 @@ export default function CreateScheduleTask() {
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchTaskHelperData = async () => {
+            setLoading(true);
             try {
                 const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_helper`, {
                     credentials: 'include',
@@ -30,6 +32,8 @@ export default function CreateScheduleTask() {
                 setCategoryOptions(data.categories || []);
             } catch (err) {
                 console.error('Failed to fetch task helper data:', err);
+            } finally {
+                setLoading(false);
             }
         };
         fetchTaskHelperData();
@@ -94,7 +98,7 @@ export default function CreateScheduleTask() {
             if (!response.ok) {
                 setError(data.error || 'Failed to create task');
             } else {
-                alert(`Registered successfully!`);
+                alert('Registered successfully!');
                 setMessage('Task created successfully!');
                 setFormData({
                     taskName: '',
@@ -128,114 +132,120 @@ export default function CreateScheduleTask() {
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {message && <p style={{ color: 'green' }}>{message}</p>}
 
-            <form onSubmit={handleSubmit}>
-                {/* Task Name */}
-                <label>
-                    Task Name*:<br />
-                    <select
-                        value={formData.taskName}
-                        onChange={e => setFormData(prev => ({ ...prev, taskName: e.target.value }))}
-                        style={{ width: '100%' }}
-                    >
-                        <option value="">-- Select a task or enter below --</option>
-                        {taskNameOptions.map((name, idx) => (
-                            <option key={idx} value={name}>{name}</option>
-                        ))}
-                    </select>
-                    <input
-                        type="text"
-                        placeholder="Or enter new task name"
-                        value={formData.taskName}
-                        onChange={handleChange}
-                        name="taskName"
-                        style={{ width: '100%', marginTop: '4px' }}
-                    />
-                </label>
-                <br /><br />
+            {loading ? (
+                <div className="flex justify-center items-center py-10">
+                    <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
+                    <span className="ml-3 text-blue-600 text-lg">Loading tasks...</span>
+                </div>
+            ) : (
+                <form onSubmit={handleSubmit}>
+                    {/* Task Name */}
+                    <label>
+                        Task Name*:<br />
+                        <select
+                            value={formData.taskName}
+                            onChange={e => setFormData(prev => ({ ...prev, taskName: e.target.value }))}
+                            style={{ width: '100%' }}
+                        >
+                            <option value="">-- Select a task or enter below --</option>
+                            {taskNameOptions.map((name, idx) => (
+                                <option key={idx} value={name}>{name}</option>
+                            ))}
+                        </select>
+                        <input
+                            type="text"
+                            placeholder="Or enter new task name"
+                            value={formData.taskName}
+                            onChange={handleChange}
+                            name="taskName"
+                            style={{ width: '100%', marginTop: '4px' }}
+                        />
+                    </label>
+                    <br /><br />
 
-                {/* Description */}
-                <label>
-                    Description:<br />
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        rows={3}
-                        style={{ width: '100%' }}
-                    />
-                </label>
-                <br /><br />
+                    {/* Description */}
+                    <label>
+                        Description:<br />
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            rows={3}
+                            style={{ width: '100%' }}
+                        />
+                    </label>
+                    <br /><br />
 
-                {/* Category */}
-                <label>
-                    Category*:<br />
-                    <select
-                        value={formData.category}
-                        onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                        style={{ width: '100%' }}
-                    >
-                        <option value="">-- Select a category or enter below --</option>
-                        {categoryOptions.map((cat, idx) => (
-                            <option key={idx} value={cat}>{cat}</option>
-                        ))}
-                    </select>
-                    <input
-                        type="text"
-                        placeholder="Or enter new category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        name="category"
-                        style={{ width: '100%', marginTop: '4px' }}
-                    />
-                </label>
-                <br /><br />
+                    {/* Category */}
+                    <label>
+                        Category*:<br />
+                        <select
+                            value={formData.category}
+                            onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                            style={{ width: '100%' }}
+                        >
+                            <option value="">-- Select a category or enter below --</option>
+                            {categoryOptions.map((cat, idx) => (
+                                <option key={idx} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <input
+                            type="text"
+                            placeholder="Or enter new category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            name="category"
+                            style={{ width: '100%', marginTop: '4px' }}
+                        />
+                    </label>
+                    <br /><br />
 
-                {/* Start Time */}
-                <label>
-                    Start Time*:<br />
-                    <input
-                        type="datetime-local"
-                        name="startTime"
-                        value={formData.startTime}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%' }}
-                    />
-                </label>
-                <br /><br />
+                    {/* Start Time */}
+                    <label>
+                        Start Time*:<br />
+                        <input
+                            type="datetime-local"
+                            name="startTime"
+                            value={formData.startTime}
+                            onChange={handleChange}
+                            required
+                            style={{ width: '100%' }}
+                        />
+                    </label>
+                    <br /><br />
 
-                {/* End Time */}
-                <label>
-                    End Time*:<br />
-                    <input
-                        type="datetime-local"
-                        name="endTime"
-                        value={formData.endTime}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%' }}
-                    />
-                </label>
-                <br /><br />
+                    {/* End Time */}
+                    <label>
+                        End Time*:<br />
+                        <input
+                            type="datetime-local"
+                            name="endTime"
+                            value={formData.endTime}
+                            onChange={handleChange}
+                            required
+                            style={{ width: '100%' }}
+                        />
+                    </label>
+                    <br /><br />
 
-                {/* Productivity Score */}
-                <label>
-                    Productivity Score (0-10):<br />
-                    <input
-                        type="number"
-                        name="productivityScore"
-                        value={formData.productivityScore}
-                        min="0"
-                        max="10"
-                        onChange={handleChange}
-                        style={{ width: '100%' }}
-                    />
-                </label>
-                <br /><br />
+                    {/* Productivity Score */}
+                    <label>
+                        Productivity Score (0-10):<br />
+                        <input
+                            type="number"
+                            name="productivityScore"
+                            value={formData.productivityScore}
+                            min="0"
+                            max="10"
+                            onChange={handleChange}
+                            style={{ width: '100%' }}
+                        />
+                    </label>
+                    <br /><br />
 
-                {/* Submit */}
-                <button type="submit">Create Task</button>
-            </form>
+                    <button type="submit">Create Task</button>
+                </form>
+            )}
         </div>
     );
 }
