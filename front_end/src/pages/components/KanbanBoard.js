@@ -54,8 +54,8 @@ export default function KanbanBoard({ board }) {
 
   useEffect(() => {
     fetchTasks();
-    setColumns(board.columns || []);
-  }, [board]);
+    fetchBoardColumns(); // Always fetch fresh board columns on mount
+  }, [board._id]);
 
   // Add new column (POST)
   const addNewColumn = async () => {
@@ -199,9 +199,8 @@ export default function KanbanBoard({ board }) {
                 setDraggedTaskId(null);
                 setDraggedOverColumn(null);
               }}
-              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] relative ${
-                draggedOverColumn === col.title ? 'bg-blue-100' : ''
-              }`}
+              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] relative ${draggedOverColumn === col.title ? 'bg-blue-100' : ''
+                }`}
             >
               <h3 className="font-semibold mb-3 flex justify-between items-center">
                 <span>{col.title}</span>
@@ -254,6 +253,7 @@ export default function KanbanBoard({ board }) {
             setModalTask(null);
             setIsCreateMode(false);
             fetchTasks();
+            fetchBoardColumns(); // Refresh columns in case a new column title is involved
           }}
           columns={columns}
         />
