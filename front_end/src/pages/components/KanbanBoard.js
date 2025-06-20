@@ -8,11 +8,13 @@ export default function KanbanBoard({ board }) {
   const [isCreateMode, setIsCreateMode] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Drag & drop state
   const [draggedTaskId, setDraggedTaskId] = useState(null);
   const [draggedOverColumn, setDraggedOverColumn] = useState(null);
 
-  // Fetch tasks from backend
+  const [columns, setColumns] = useState(board.columns || []);
+  const [newColumnName, setNewColumnName] = useState('');
+
+  // Fetch tasks
   const fetchTasks = async () => {
     setLoading(true);
     try {
@@ -34,81 +36,122 @@ export default function KanbanBoard({ board }) {
     }
   };
 
+  // Fetch updated board with columns
+  const fetchBoardColumns = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/kanban_board/${board._id}`,
+        { method: 'GET', credentials: 'include' }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.columns) setColumns(data.columns);
+      }
+    } catch (err) {
+      console.error('Failed to fetch board columns:', err);
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
+    setColumns(board.columns || []);
   }, [board]);
 
-  // Handle drag start on task card
-  const onDragStart = (e, taskId) => {
-    setDraggedTaskId(taskId);
-    // For Firefox compatibility
-    e.dataTransfer.setData('text/plain', taskId);
-  };
+  // Add new column (POST)
+  const addNewColumn = async () => {
+    const trimmedName = newColumnName.trim();
+    if (!trimmedName) return;
 
-  // When a column is dragged over
-  const onDragOver = (e, columnTitle) => {
-    e.preventDefault(); // Needed to allow drop
-    setDraggedOverColumn(columnTitle);
-  };
-
-  // When task dropped on a column
-  const onDrop = async (e, columnTitle) => {
-    e.preventDefault();
-    if (!draggedTaskId) return;
-
-    // Find the dragged task
-    const movingTask = tasks.find((t) => t._id.toString() === draggedTaskId);
-    if (!movingTask) return;
-
-    if (movingTask.columnTitle === columnTitle) {
-      // Same column, do nothing or you can implement reorder if you want
-      setDraggedTaskId(null);
-      setDraggedOverColumn(null);
+    if (columns.find((col) => col.title === trimmedName)) {
+      alert('Column with this name already exists!');
       return;
     }
 
-    // Update the task's column on backend
-    const updatedTask = {
-      ...movingTask,
-      columnTitle: columnTitle,
-    };
-
     try {
-      await api.put(
-        `/kanban_task/${board._id}/tasks/${draggedTaskId}`,
-        updatedTask
+      console.log(trimmedName)
+      const res = await api.post(
+        `/kanban_board/${board._id}/columns`,
+        { title: trimmedName }
       );
-      await fetchTasks();
-    } catch (error) {
-      console.error('Failed to update task:', error);
-    }
 
-    setDraggedTaskId(null);
-    setDraggedOverColumn(null);
+      if (res.status === 201 || res.status === 200) {
+        await fetchBoardColumns();
+        setNewColumnName('');
+      } else {
+        alert('Failed to add column');
+      }
+    } catch (error) {
+      console.error('Error adding new column:', error);
+      alert('Error adding new column');
+    }
   };
 
-  // Group tasks by column title
-  const grouped = board.columns.map((col) => ({
+  // Delete column (DELETE)
+  const deleteColumn = async (columnId, columnTitle) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete the column "${columnTitle}"? This will also delete tasks in this column.`
+      )
+    )
+      return;
+
+    try {
+      const res = await api.delete(
+        `/kanban_board/${board._id}/columns/${columnId}`
+      );
+
+      if (res.status === 200) {
+        await fetchBoardColumns();
+        // Optionally refresh tasks to reflect deleted column tasks removed
+        await fetchTasks();
+      } else {
+        alert('Failed to delete column');
+      }
+    } catch (error) {
+      console.error('Error deleting column:', error);
+      alert('Error deleting column');
+    }
+  };
+
+  // Drag handlers...
+
+  // Group tasks by current columns state
+  const grouped = columns.map((col) => ({
     ...col,
     items: tasks
       .filter((t) => t.columnTitle === col.title)
       .sort((a, b) => a.order - b.order),
   }));
 
-  const openCreateModal = () => {
-    setModalTask(null);
-    setIsCreateMode(true);
-  };
-
   return (
     <div className="p-4">
-      <div className="flex justify-between mb-4">
+      <div className="flex justify-between mb-4 items-center">
         <h2 className="text-xl font-bold">{board.title}</h2>
         <button
-          onClick={openCreateModal}
+          onClick={() => {
+            setModalTask(null);
+            setIsCreateMode(true);
+          }}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New Task
+        </button>
+      </div>
+
+      {/* Add new column input */}
+      <div className="mb-4 flex gap-2 items-center">
+        <input
+          type="text"
+          placeholder="New column name"
+          value={newColumnName}
+          onChange={(e) => setNewColumnName(e.target.value)}
+          className="border border-gray-300 rounded px-2 py-1"
+        />
+        <button
+          onClick={addNewColumn}
+          className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+        >
+          Add Column
         </button>
       </div>
 
@@ -119,13 +162,58 @@ export default function KanbanBoard({ board }) {
           {grouped.map((col) => (
             <div
               key={col._id}
-              onDragOver={(e) => onDragOver(e, col.title)}
-              onDrop={(e) => onDrop(e, col.title)}
-              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] ${
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDraggedOverColumn(col.title);
+              }}
+              onDrop={async (e) => {
+                e.preventDefault();
+                if (!draggedTaskId) return;
+
+                const movingTask = tasks.find(
+                  (t) => t._id.toString() === draggedTaskId
+                );
+                if (!movingTask) return;
+
+                if (movingTask.columnTitle === col.title) {
+                  setDraggedTaskId(null);
+                  setDraggedOverColumn(null);
+                  return;
+                }
+
+                const updatedTask = {
+                  ...movingTask,
+                  columnTitle: col.title,
+                };
+
+                try {
+                  await api.put(
+                    `/kanban_task/${board._id}/tasks/${draggedTaskId}`,
+                    updatedTask
+                  );
+                  await fetchTasks();
+                } catch (error) {
+                  console.error('Failed to update task:', error);
+                }
+
+                setDraggedTaskId(null);
+                setDraggedOverColumn(null);
+              }}
+              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] relative ${
                 draggedOverColumn === col.title ? 'bg-blue-100' : ''
               }`}
             >
-              <h3 className="font-semibold mb-3">{col.title}</h3>
+              <h3 className="font-semibold mb-3 flex justify-between items-center">
+                <span>{col.title}</span>
+                <button
+                  onClick={() => deleteColumn(col._id, col.title)}
+                  className="text-red-600 hover:text-red-800 text-lg font-bold"
+                  title="Delete column"
+                  type="button"
+                >
+                  &times;
+                </button>
+              </h3>
 
               {col.items.length === 0 && (
                 <p className="text-gray-400 italic">No tasks</p>
@@ -135,7 +223,10 @@ export default function KanbanBoard({ board }) {
                 <div
                   key={task._id}
                   draggable
-                  onDragStart={(e) => onDragStart(e, task._id.toString())}
+                  onDragStart={(e) => {
+                    setDraggedTaskId(task._id.toString());
+                    e.dataTransfer.setData('text/plain', task._id.toString());
+                  }}
                   className="bg-white p-3 mb-2 rounded shadow cursor-pointer hover:bg-gray-50"
                   onClick={() => {
                     setModalTask(task);
@@ -143,7 +234,9 @@ export default function KanbanBoard({ board }) {
                   }}
                 >
                   <p className="font-medium">{task.title}</p>
-                  <p className="text-sm text-gray-500">Priority: {task.priority}</p>
+                  <p className="text-sm text-gray-500">
+                    Priority: {task.priority}
+                  </p>
                   <p className="text-xs text-gray-400 truncate">ID: {task._id}</p>
                 </div>
               ))}
@@ -162,7 +255,7 @@ export default function KanbanBoard({ board }) {
             setIsCreateMode(false);
             fetchTasks();
           }}
-          columns={board.columns}
+          columns={columns}
         />
       )}
     </div>

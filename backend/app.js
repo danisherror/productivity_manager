@@ -19,10 +19,11 @@ const userSchedule = require('./Routes/UserSchedule')
 const kanbanBoard = require('./Routes/kanbanBoard');
 const kanbanComment = require('./Routes/kanbanComment');
 const kanbanTask = require('./Routes/kanbanTask')
+const kanbanColumn = require('./Routes/kanbanBoardColumns')
 app.use("/api",user)
 app.use("/api",userSchedule)
 app.use("/api",kanbanBoard)
 app.use("/api",kanbanComment)
 app.use("/api",kanbanTask)
-
+app.use("/api",kanbanColumn)
 module.exports=app;
