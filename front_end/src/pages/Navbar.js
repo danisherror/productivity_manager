@@ -5,7 +5,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isOpen, setIsOpen] = useState(false); // state for collapse toggle
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -56,49 +56,74 @@ const Navbar = () => {
   });
 
   return (
-    <nav style={{
-      padding: '15px',
-      backgroundColor: '#eee',
-      borderBottom: '1px solid #ccc',
-    }}>
-      {/* Hamburger Toggle Button */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ margin: 0 }}>My App</h2>
+    <>
+      <nav style={{
+        padding: '15px',
+        backgroundColor: '#eee',
+        borderBottom: '1px solid #ccc',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ margin: 0 }}>My App</h2>
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            style={{
+              fontSize: '20px',
+              padding: '10px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            ☰
+          </button>
+        </div>
+
+        {isOpen && (
+          <div style={{ marginTop: '10px' }}>
+            {isLoggedIn ? (
+              <>
+                <Link to="/" style={linkStyle('/')}>Home</Link>
+                <Link to="/profile" style={linkStyle('/profile')}>Profile</Link>
+                <Link to="/CreateScheduleTask" style={linkStyle('/CreateScheduleTask')}>Create Task</Link>
+                <Link to="/AllScheduleTasks" style={linkStyle('/AllScheduleTasks')}>All Tasks</Link>
+                <Link to="/analysis" style={linkStyle('/analysis')}>Analysis</Link>
+                <button onClick={handleLogout} style={{ ...linkStyle(), backgroundColor: '#dc3545', color: '#fff' }}>Logout</button>
+              </>
+            ) : (
+              <>
+                <Link to="/signin" style={linkStyle('/signin')}>Sign In</Link>
+                <Link to="/signup" style={linkStyle('/signup')}>Sign Up</Link>
+              </>
+            )}
+          </div>
+        )}
+      </nav>
+
+      {/* Floating Action Button */}
+      {isLoggedIn && (
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => navigate('/CreateScheduleTask')}
+          title="Create Task"
           style={{
-            fontSize: '20px',
-            padding: '10px',
-            backgroundColor: 'transparent',
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            fontSize: '28px',
             border: 'none',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
             cursor: 'pointer',
+            zIndex: 999,
           }}
         >
-          ☰
+          +
         </button>
-      </div>
-
-      {/* Collapsible links */}
-      {isOpen && (
-        <div style={{ marginTop: '10px' }}>
-          {isLoggedIn ? (
-            <>
-              <Link to="/" style={linkStyle('/')}>Home</Link>
-              <Link to="/profile" style={linkStyle('/profile')}>Profile</Link>
-              <Link to="/CreateScheduleTask" style={linkStyle('/CreateScheduleTask')}>Create Task</Link>
-              <Link to="/AllScheduleTasks" style={linkStyle('/AllScheduleTasks')}>All Tasks</Link>
-              <Link to="/analysis" style={linkStyle('/analysis')}>Analysis</Link>
-              <button onClick={handleLogout} style={{ ...linkStyle(), backgroundColor: '#dc3545', color: '#fff' }}>Logout</button>
-            </>
-          ) : (
-            <>
-              <Link to="/signin" style={linkStyle('/signin')}>Sign In</Link>
-              <Link to="/signup" style={linkStyle('/signup')}>Sign Up</Link>
-            </>
-          )}
-        </div>
       )}
-    </nav>
+    </>
   );
 };
 
