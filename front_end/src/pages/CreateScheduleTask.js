@@ -9,7 +9,7 @@ export default function CreateScheduleTask() {
         startTime: '',
         endTime: '',
         isCompleted: true,
-        productivityScore: '',
+        productivityScore: 0,
         mood: 'Neutral',
         energyLevel: 5,
     });
@@ -229,7 +229,7 @@ export default function CreateScheduleTask() {
                     <br /><br />
 
                     {/* Productivity Score */}
-                    <label>
+                    {/* <label>
                         Productivity Score (0-10):<br />
                         <input
                             type="number"
@@ -241,7 +241,7 @@ export default function CreateScheduleTask() {
                             style={{ width: '100%' }}
                         />
                     </label>
-                    <br /><br />
+                    <br /><br /> */}
 
                     <button type="submit">Create Task</button>
                 </form>

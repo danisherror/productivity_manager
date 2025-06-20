@@ -212,7 +212,7 @@ export default function EditTask() {
           </label><br /><br />
 
           {/* Productivity Score */}
-          <label>Productivity Score:<br />
+          {/* <label>Productivity Score:<br />
             <input
               name="productivityScore"
               type="number"
@@ -222,7 +222,7 @@ export default function EditTask() {
               onChange={handleChange}
               style={{ width: '100%' }}
             />
-          </label><br /><br />
+          </label><br /><br /> */}
 
           {/* Submit */}
           <button type="submit">Update Task</button>
