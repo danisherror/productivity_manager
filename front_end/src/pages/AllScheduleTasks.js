@@ -115,57 +115,67 @@ export default function AllTasks() {
     };
 
     return (
-        <div style={{ maxWidth: 900, margin: 'auto' }}>
-            <h2>All Scheduled Tasks</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="max-w-5xl mx-auto p-4">
+            <h2 className="text-2xl font-bold mb-6 text-center">All Scheduled Tasks</h2>
+            {error && <p className="text-red-500 mb-4">{error}</p>}
 
-            <div style={{ marginBottom: '20px' }}>
-                <label>
-                    Filter by Date:&nbsp;
-                    <input type="date" value={dateFilter} onChange={e => setDateFilter(e.target.value)} />
-                </label>
-                <br /><br />
-                <label>
-                    Search (in task name, category, tags, description):&nbsp;
+            <div className="mb-6 space-y-4">
+                <div>
+                    <label className="font-medium">Filter by Date:&nbsp;</label>
+                    <input
+                        type="date"
+                        value={dateFilter}
+                        onChange={e => setDateFilter(e.target.value)}
+                        className="border rounded px-3 py-2"
+                    />
+                </div>
+
+                <div>
+                    <label className="font-medium block mb-1">Search (task name, category, tags, description):</label>
                     <input
                         type="text"
                         placeholder="e.g. work, urgent, sleep"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        style={{ width: '100%', padding: '8px' }}
+                        className="w-full border px-3 py-2 rounded"
                     />
-                </label>
-                <small style={{ color: '#666' }}>
-                    Tip: Use commas to search multiple terms (e.g. "sleep, urgent")
-                </small>
-                <br /><br />
-                <label>
-                    Sort by:&nbsp;
-                    <select value={sortBy} onChange={e => setSortBy(e.target.value)}>
-                        <option value="">None</option>
-                        <option value="startAsc">Start Time ↑</option>
-                        <option value="startDesc">Start Time ↓</option>
-                        <option value="endAsc">End Time ↑</option>
-                        <option value="endDesc">End Time ↓</option>
-                    </select>
-                </label>
-                <br /><br />
-                <label>
-                    Tasks per page:&nbsp;
-                    <select
-                        value={tasksPerPage}
-                        onChange={(e) => {
-                            setTasksPerPage(Number(e.target.value));
-                            setCurrentPage(1);
-                        }}
-                    >
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                        <option value={100}>100</option>
-                    </select>
-                </label>
+                    <small className="text-gray-500">
+                        Tip: Use commas to search multiple terms (e.g. "sleep, urgent")
+                    </small>
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                    <label>
+                        <span className="font-medium">Sort by:&nbsp;</span>
+                        <select
+                            value={sortBy}
+                            onChange={e => setSortBy(e.target.value)}
+                            className="border px-3 py-2 rounded"
+                        >
+                            <option value="">None</option>
+                            <option value="startAsc">Start Time ↑</option>
+                            <option value="startDesc">Start Time ↓</option>
+                            <option value="endAsc">End Time ↑</option>
+                            <option value="endDesc">End Time ↓</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        <span className="font-medium">Tasks per page:&nbsp;</span>
+                        <select
+                            value={tasksPerPage}
+                            onChange={(e) => {
+                                setTasksPerPage(Number(e.target.value));
+                                setCurrentPage(1);
+                            }}
+                            className="border px-3 py-2 rounded"
+                        >
+                            {[5, 10, 25, 50, 100].map(num => (
+                                <option key={num} value={num}>{num}</option>
+                            ))}
+                        </select>
+                    </label>
+                </div>
             </div>
 
             {loading ? (
@@ -174,61 +184,66 @@ export default function AllTasks() {
                     <span className="ml-3 text-blue-600 text-lg">Loading tasks...</span>
                 </div>
             ) : currentTasks.length === 0 ? (
-                <p>No tasks found.</p>
+                <p className="text-center text-gray-600">No tasks found.</p>
             ) : (
                 <>
-                    <table border="1" cellPadding="10" width="100%">
-                        <thead>
-                            <tr>
-                                <th>Task</th>
-                                <th>Category</th>
-                                <th>Description</th>
-                                <th>Dura in mins</th>
-                                <th>Start</th>
-                                <th>End</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentTasks.map(task => (
-                                <tr key={task._id}>
-                                    <td>{task.taskName}</td>
-                                    <td>{task.category}</td>
-                                    <td>{task.description}</td>
-                                    <td>{task.duration}</td>
-                                    <td>{new Date(task.startTime).toLocaleString()}</td>
-                                    <td>{new Date(task.endTime).toLocaleString()}</td>
-                                    <td>
-                                        <Link to={`/EditTask/${task._id}`}>Edit</Link> |{' '}
-                                        <button onClick={() => deleteTask(task._id)}>Delete</button>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white shadow rounded overflow-hidden">
+                            <thead className="bg-blue-600 text-white text-sm">
+                                <tr>
+                                    <th className="py-3 px-4 text-left">Task</th>
+                                    <th className="py-3 px-4 text-left">Category</th>
+                                    <th className="py-3 px-4 text-left">Description</th>
+                                    <th className="py-3 px-4 text-left">Duration (min)</th>
+                                    <th className="py-3 px-4 text-left">Start</th>
+                                    <th className="py-3 px-4 text-left">End</th>
+                                    <th className="py-3 px-4 text-left">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="text-sm divide-y">
+                                {currentTasks.map(task => (
+                                    <tr key={task._id} className="hover:bg-gray-50">
+                                        <td className="py-2 px-4">{task.taskName}</td>
+                                        <td className="py-2 px-4">{task.category}</td>
+                                        <td className="py-2 px-4">{task.description}</td>
+                                        <td className="py-2 px-4">{task.duration}</td>
+                                        <td className="py-2 px-4">{new Date(task.startTime).toLocaleString()}</td>
+                                        <td className="py-2 px-4">{new Date(task.endTime).toLocaleString()}</td>
+                                        <td className="py-2 px-4 space-x-2">
+                                            <Link to={`/EditTask/${task._id}`} className="text-blue-500 hover:underline">Edit</Link>
+                                            <button
+                                                onClick={() => deleteTask(task._id)}
+                                                className="text-red-500 hover:underline"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div className="mt-8 flex flex-wrap justify-center items-center gap-2">
-                        <button
-                            onClick={() => goToPage(1)}
-                            disabled={currentPage === 1}
-                            className={`px-3 py-1 rounded border text-sm ${currentPage === 1
-                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
-                                }`}
-                        >
-                            ⏮ First
-                        </button>
-                        <button
-                            onClick={() => goToPage(currentPage - 1)}
-                            disabled={currentPage === 1}
-                            className={`px-3 py-1 rounded border text-sm ${currentPage === 1
-                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
-                                }`}
-                        >
-                            ⬅ Prev
-                        </button>
+                        {/* pagination buttons, unchanged logic, but Tailwind applied */}
+                        {[
+                            { label: '⏮ First', action: () => goToPage(1), disabled: currentPage === 1 },
+                            { label: '⬅ Prev', action: () => goToPage(currentPage - 1), disabled: currentPage === 1 },
+                        ].map(({ label, action, disabled }) => (
+                            <button
+                                key={label}
+                                onClick={action}
+                                disabled={disabled}
+                                className={`px-3 py-1 rounded border text-sm ${disabled
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                                    }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
 
+                        {/* page number buttons */}
                         {(() => {
                             const pageButtons = [];
                             const maxVisible = 5;
@@ -292,26 +307,22 @@ export default function AllTasks() {
                             return pageButtons;
                         })()}
 
-                        <button
-                            onClick={() => goToPage(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            className={`px-3 py-1 rounded border text-sm ${currentPage === totalPages
-                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
-                                }`}
-                        >
-                            Next ➡
-                        </button>
-                        <button
-                            onClick={() => goToPage(totalPages)}
-                            disabled={currentPage === totalPages}
-                            className={`px-3 py-1 rounded border text-sm ${currentPage === totalPages
-                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
-                                }`}
-                        >
-                            Last ⏭
-                        </button>
+                        {[
+                            { label: 'Next ➡', action: () => goToPage(currentPage + 1), disabled: currentPage === totalPages },
+                            { label: 'Last ⏭', action: () => goToPage(totalPages), disabled: currentPage === totalPages },
+                        ].map(({ label, action, disabled }) => (
+                            <button
+                                key={label}
+                                onClick={action}
+                                disabled={disabled}
+                                className={`px-3 py-1 rounded border text-sm ${disabled
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+                                    }`}
+                            >
+                                {label}
+                            </button>
+                        ))}
                     </div>
                 </>
             )}

@@ -37,19 +37,41 @@ function UserProfile() {
     );
   }
 
-  if (error) return <p className="text-red-600">Error: {error}</p>;
-  if (!user) return <p>No user found.</p>;
+  if (error)
+    return <p className="text-red-600 font-semibold text-center mt-6">Error: {error}</p>;
+
+  if (!user)
+    return <p className="text-gray-600 font-medium text-center mt-6">No user found.</p>;
 
   return (
-    <div>
-      <h1>User Profile</h1>
-      <p><strong>Name:</strong> {user.name}</p>
-      <p><strong>Username:</strong> {user.username}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p>
-        <Link to="/CreateScheduleTask" style={{ marginRight: '1rem' }}>Create Task</Link>
-        <Link to="/AllScheduleTasks" style={{ marginRight: '1rem' }}>See All Tasks</Link>
-      </p>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">User Profile</h1>
+      <div className="space-y-4 text-gray-700">
+        <p>
+          <strong className="font-semibold">Name:</strong> {user.name}
+        </p>
+        <p>
+          <strong className="font-semibold">Username:</strong> {user.username}
+        </p>
+        <p>
+          <strong className="font-semibold">Email:</strong> {user.email}
+        </p>
+      </div>
+
+      <div className="mt-8 flex justify-center space-x-6">
+        <Link
+          to="/CreateScheduleTask"
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Create Task
+        </Link>
+        <Link
+          to="/AllScheduleTasks"
+          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
+        >
+          See All Tasks
+        </Link>
+      </div>
     </div>
   );
 }

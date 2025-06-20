@@ -127,23 +127,22 @@ export default function EditTask() {
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: 'auto' }}>
-      <h2>Edit Task</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-md">
+      <h2 className="text-2xl font-bold mb-4">Edit Task</h2>
+      {error && <p className="text-red-600 mb-4">{error}</p>}
       {(loadingHelper || loadingInfo) ? (
         <div className="flex justify-center items-center py-10">
           <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
           <span className="ml-3 text-blue-600 text-lg">Loading helper data...</span>
         </div>
       ) : (
-        <form onSubmit={handleSubmit}>
-
-          {/* Task Name */}
-          <label>Task Name:<br />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-semibold">Task Name:</label>
             <select
+              className="w-full border p-2 rounded mt-1"
               value={formData.taskName}
               onChange={e => setFormData(prev => ({ ...prev, taskName: e.target.value }))}
-              style={{ width: '100%' }}
             >
               <option value="">-- Select or enter below --</option>
               {taskNameOptions.map((name, idx) => (
@@ -151,26 +150,31 @@ export default function EditTask() {
               ))}
             </select>
             <input
+              className="w-full border p-2 rounded mt-2"
               type="text"
               placeholder="Or enter new task name"
               name="taskName"
               value={formData.taskName}
               onChange={handleChange}
-              style={{ width: '100%', marginTop: '4px' }}
             />
-          </label><br /><br />
+          </div>
 
-          {/* Description */}
-          <label>Description:<br />
-            <textarea name="description" value={formData.description} onChange={handleChange} style={{ width: '100%' }} />
-          </label><br /><br />
+          <div>
+            <label className="block font-semibold">Description:</label>
+            <textarea
+              className="w-full border p-2 rounded mt-1"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </div>
 
-          {/* Category */}
-          <label>Category:<br />
+          <div>
+            <label className="block font-semibold">Category:</label>
             <select
+              className="w-full border p-2 rounded mt-1"
               value={formData.category}
               onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
-              style={{ width: '100%' }}
             >
               <option value="">-- Select or enter below --</option>
               {categoryOptions.map((cat, idx) => (
@@ -178,57 +182,54 @@ export default function EditTask() {
               ))}
             </select>
             <input
+              className="w-full border p-2 rounded mt-2"
               type="text"
               placeholder="Or enter new category"
               name="category"
               value={formData.category}
               onChange={handleChange}
-              style={{ width: '100%', marginTop: '4px' }}
             />
-          </label><br /><br />
+          </div>
 
-          {/* Start Time */}
-          <label>Start Time:<br />
+          <div>
+            <label className="block font-semibold">Start Time:</label>
             <input
+              className="w-full border p-2 rounded mt-1"
               type="datetime-local"
               name="startTime"
               value={new Date(formData.startTime).toISOString().slice(0, 16)}
               onChange={handleChange}
               required
-              style={{ width: '100%' }}
             />
-          </label><br /><br />
+          </div>
 
-          {/* End Time */}
-          <label>End Time:<br />
+          <div>
+            <label className="block font-semibold">End Time:</label>
             <input
+              className="w-full border p-2 rounded mt-1"
               type="datetime-local"
               name="endTime"
               value={new Date(formData.endTime).toISOString().slice(0, 16)}
               onChange={handleChange}
               required
-              style={{ width: '100%' }}
             />
-          </label><br /><br />
+          </div>
 
-          {/* Productivity Score */}
-          {/* <label>Productivity Score:<br />
-            <input
-              name="productivityScore"
-              type="number"
-              min="0"
-              max="10"
-              value={formData.productivityScore}
-              onChange={handleChange}
-              style={{ width: '100%' }}
-            />
-          </label><br /><br /> */}
-
-          {/* Submit */}
-          <button type="submit">Update Task</button>
-          <button type="button" onClick={() => navigate('/AllScheduleTasks')} style={{ marginLeft: 10 }}>
-            Cancel
-          </button>
+          <div className="flex space-x-4">
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Update Task
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/AllScheduleTasks')}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       )}
     </div>

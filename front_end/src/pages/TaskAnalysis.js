@@ -50,7 +50,6 @@ const TaskAnalysis = () => {
 
   const isWithinRange = (date, from, to) => {
     const d = new Date(date);
-
     const fromDate = from ? new Date(from) : null;
     let toDate = to ? new Date(to) : null;
 
@@ -93,40 +92,43 @@ const TaskAnalysis = () => {
   const data = generateSummary(selectedParam);
 
   return (
-    <div style={{ maxWidth: 1200, margin: 'auto' }}>
-      <h2>Task Analysis by Parameter</h2>
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h2 className="text-2xl font-bold mb-6 text-center">📊 Task Analysis</h2>
 
-      <div style={{ marginBottom: '20px' }}>
-        <label htmlFor="startDate">Start Date:&nbsp;</label>
-        <input
-          id="startDate"
-          type="date"
-          value={startDate}
-          onChange={e => setStartDate(e.target.value)}
-        />
-        &nbsp;&nbsp;
-        <label htmlFor="endDate">End Date:&nbsp;</label>
-        <input
-          id="endDate"
-          type="date"
-          value={endDate}
-          onChange={e => setEndDate(e.target.value)}
-        />
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
-        <label htmlFor="paramSelect">Select Parameter:&nbsp;</label>
-        <select
-          id="paramSelect"
-          value={selectedParam}
-          onChange={e => setSelectedParam(e.target.value)}
-        >
-          {parameters.map(param => (
-            <option key={param} value={param}>
-              {paramLabels[param]}
-            </option>
-          ))}
-        </select>
+      <div className="flex flex-col md:flex-row gap-6 mb-6 items-center justify-center">
+        <div>
+          <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
+          <input
+            id="startDate"
+            type="date"
+            value={startDate}
+            onChange={e => setStartDate(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-1.5 shadow-sm focus:ring focus:ring-blue-200"
+          />
+        </div>
+        <div>
+          <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
+          <input
+            id="endDate"
+            type="date"
+            value={endDate}
+            onChange={e => setEndDate(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-1.5 shadow-sm focus:ring focus:ring-blue-200"
+          />
+        </div>
+        <div>
+          <label htmlFor="paramSelect" className="block text-sm font-medium text-gray-700">Parameter</label>
+          <select
+            id="paramSelect"
+            value={selectedParam}
+            onChange={e => setSelectedParam(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-1.5 shadow-sm focus:ring focus:ring-blue-200"
+          >
+            {parameters.map(param => (
+              <option key={param} value={param}>{paramLabels[param]}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading && (
@@ -136,42 +138,53 @@ const TaskAnalysis = () => {
         </div>
       )}
 
-      {error && <div style={{ color: 'red' }}>{error}</div>}
+      {error && (
+        <div className="text-red-600 text-center my-4 font-medium">{error}</div>
+      )}
 
       {!loading && !error && filtered.length === 0 && (
-        <div>No tasks found for selected date range.</div>
+        <div className="text-center text-gray-500">No tasks found for selected date range.</div>
       )}
 
       {!loading && !error && filtered.length > 0 && data.length === 0 && (
-        <div>No data available for {paramLabels[selectedParam]}.</div>
+        <div className="text-center text-gray-500">No data available for {paramLabels[selectedParam]}.</div>
       )}
 
       {!loading && !error && data.length > 0 && (
-        <div style={{ marginBottom: 50 }}>
-          <h3>Analysis by {paramLabels[selectedParam]}</h3>
-          <BarChart width={700} height={300} data={data}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="minutes" fill={COLORS[parameters.indexOf(selectedParam) % COLORS.length]} />
-          </BarChart>
-          <PieChart width={400} height={300}>
-            <Pie
-              data={data}
-              dataKey="minutes"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label
-            >
-              {data.map((entry, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
+        <div className="grid md:grid-cols-2 gap-10 mt-8">
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-center">Bar Chart</h3>
+            <BarChart width={500} height={300} data={data}>
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar
+                dataKey="minutes"
+                fill={COLORS[parameters.indexOf(selectedParam) % COLORS.length]}
+              />
+            </BarChart>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold mb-4 text-center">Pie Chart</h3>
+            <PieChart width={400} height={300}>
+              <Pie
+                data={data}
+                dataKey="minutes"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label
+              >
+                {data.map((entry, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </div>
         </div>
       )}
     </div>
