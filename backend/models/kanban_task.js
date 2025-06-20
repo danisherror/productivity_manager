@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const taskSchema = new mongoose.Schema({
   boardId: { type: mongoose.Schema.Types.ObjectId, ref: "KanbanBoard" },
   columnTitle: { type: String, required: true },
