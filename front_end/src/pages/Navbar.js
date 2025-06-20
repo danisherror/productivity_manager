@@ -45,54 +45,61 @@ const Navbar = () => {
     }
   };
 
-  const linkStyle = (path) => ({
-    padding: '10px 15px',
-    margin: '5px 0',
-    textDecoration: 'none',
-    color: location.pathname === path ? '#fff' : '#333',
-    backgroundColor: location.pathname === path ? '#007bff' : '#f1f1f1',
-    borderRadius: '5px',
-    display: 'block',
-  });
+  const linkClasses = (path) =>
+    `block px-4 py-2 rounded-md my-1 transition-colors duration-200 ${
+      location.pathname === path
+        ? 'bg-blue-600 text-white'
+        : 'bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white'
+    }`;
 
   return (
     <>
-      <nav style={{
-        padding: '15px',
-        backgroundColor: '#eee',
-        borderBottom: '1px solid #ccc',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ margin: 0 }}>My App</h2>
+      <nav className="bg-gray-100 border-b border-gray-300 p-4">
+        <div className="flex justify-between items-center max-w-7xl mx-auto">
+          <h2 className="text-xl font-semibold text-gray-800">My App</h2>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            style={{
-              fontSize: '20px',
-              padding: '10px',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className="text-2xl p-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Toggle menu"
           >
             ☰
           </button>
         </div>
 
         {isOpen && (
-          <div style={{ marginTop: '10px' }}>
+          <div className="mt-3 max-w-7xl mx-auto">
             {isLoggedIn ? (
               <>
-                <Link to="/" style={linkStyle('/')}>Home</Link>
-                <Link to="/profile" style={linkStyle('/profile')}>Profile</Link>
-                <Link to="/CreateScheduleTask" style={linkStyle('/CreateScheduleTask')}>Create Task</Link>
-                <Link to="/AllScheduleTasks" style={linkStyle('/AllScheduleTasks')}>All Tasks</Link>
-                <Link to="/analysis" style={linkStyle('/analysis')}>Analysis</Link>
-                <button onClick={handleLogout} style={{ ...linkStyle(), backgroundColor: '#dc3545', color: '#fff' }}>Logout</button>
+                <Link to="/" className={linkClasses('/')}>
+                  Home
+                </Link>
+                <Link to="/profile" className={linkClasses('/profile')}>
+                  Profile
+                </Link>
+                <Link to="/CreateScheduleTask" className={linkClasses('/CreateScheduleTask')}>
+                  Create Task
+                </Link>
+                <Link to="/AllScheduleTasks" className={linkClasses('/AllScheduleTasks')}>
+                  All Tasks
+                </Link>
+                <Link to="/analysis" className={linkClasses('/analysis')}>
+                  Analysis
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full px-4 py-2 my-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200"
+                >
+                  Logout
+                </button>
               </>
             ) : (
               <>
-                <Link to="/signin" style={linkStyle('/signin')}>Sign In</Link>
-                <Link to="/signup" style={linkStyle('/signup')}>Sign Up</Link>
+                <Link to="/signin" className={linkClasses('/signin')}>
+                  Sign In
+                </Link>
+                <Link to="/signup" className={linkClasses('/signup')}>
+                  Sign Up
+                </Link>
               </>
             )}
           </div>
@@ -104,21 +111,7 @@ const Navbar = () => {
         <button
           onClick={() => navigate('/CreateScheduleTask')}
           title="Create Task"
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            width: '60px',
-            height: '60px',
-            borderRadius: '50%',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            fontSize: '28px',
-            border: 'none',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-            cursor: 'pointer',
-            zIndex: 999,
-          }}
+          className="fixed bottom-5 right-5 w-14 h-14 rounded-full bg-blue-600 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
         >
           +
         </button>

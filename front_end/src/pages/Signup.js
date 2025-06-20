@@ -92,103 +92,129 @@ function Signup() {
   };
 
   return (
-    <div>
-      <h2>Sign Up to eReside</h2>
-      <form onSubmit={handleSubmit}>
-        {/* Name */}
-        <div>
-          <label>Name</label>
-          <input
-            type="text"
-            name="name"
-            autoComplete="off"
-            value={formData.name}
-            onChange={handleFormChange}
-            required
-            placeholder="Enter your full name"
-            disabled={isSubmitting}
-          />
-          {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">
+          Sign Up to eReside
+        </h2>
 
-        {/* Username */}
-        <div>
-          <label>Username</label>
-          <input
-            type="text"
-            name="username"
-            autoComplete="off"
-            value={formData.username}
-            onChange={handleFormChange}
-            required
-            placeholder="Enter your unique username"
-            disabled={isSubmitting}
-          />
-          {errors.username && <p style={{ color: 'red' }}>{errors.username}</p>}
-        </div>
-
-        {/* Email */}
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            autoComplete="off"
-            value={formData.email}
-            onChange={handleFormChange}
-            required
-            placeholder="Enter your email"
-            disabled={isSubmitting}
-          />
-          {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
-        </div>
-
-        {/* Password */}
-        <div>
-          <label>Password</label>
-          <div style={{ position: 'relative' }}>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Name */}
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              Name
+            </label>
             <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
+              type="text"
+              name="name"
+              id="name"
               autoComplete="off"
-              value={formData.password}
+              value={formData.name}
               onChange={handleFormChange}
               required
-              placeholder="Enter your password"
+              placeholder="Enter your full name"
               disabled={isSubmitting}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                errors.name ? 'border-red-500' : 'border-gray-300'
+              }`}
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              disabled={isSubmitting}
-              style={{
-                position: 'absolute',
-                right: 10,
-                top: '30%',
-                background: 'none',
-                border: 'none',
-                color: 'blue',
-                cursor: 'pointer',
-              }}
-            >
-              {showPassword ? 'Hide' : 'Show'}
-            </button>
+            {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name}</p>}
           </div>
-          {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
-        </div>
 
-        {/* Submit Button */}
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Creating account...' : 'Create account'}
-        </button>
+          {/* Username */}
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              autoComplete="off"
+              value={formData.username}
+              onChange={handleFormChange}
+              required
+              placeholder="Enter your unique username"
+              disabled={isSubmitting}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                errors.username ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.username && <p className="text-red-600 text-sm mt-1">{errors.username}</p>}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              autoComplete="off"
+              value={formData.email}
+              onChange={handleFormChange}
+              required
+              placeholder="Enter your email"
+              disabled={isSubmitting}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                errors.email ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
+          </div>
+
+          {/* Password */}
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                id="password"
+                autoComplete="off"
+                value={formData.password}
+                onChange={handleFormChange}
+                required
+                placeholder="Enter your password"
+                disabled={isSubmitting}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                  errors.password ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isSubmitting}
+                className="absolute right-3 top-2 text-indigo-600 hover:text-indigo-800 font-semibold"
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            {errors.password && <p className="text-red-600 text-sm mt-1">{errors.password}</p>}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-indigo-600 text-white py-2 rounded-md font-semibold hover:bg-indigo-700 transition-colors duration-300"
+          >
+            {isSubmitting ? 'Creating account...' : 'Create account'}
+          </button>
+        </form>
 
         {/* Redirect to Login */}
-        <div>
-          <p>
-            Already have an account? <Link to="/signin">Sign in</Link>
-          </p>
-        </div>
-      </form>
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Already have an account?{' '}
+          <Link to="/signin" className="text-indigo-600 hover:text-indigo-800 font-medium">
+            Sign in
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
