@@ -14,8 +14,26 @@ export default function CreateScheduleTask() {
         energyLevel: 5,
     });
 
+    const [taskNameOptions, setTaskNameOptions] = useState([]);
+    const [categoryOptions, setCategoryOptions] = useState([]);
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchTaskHelperData = async () => {
+            try {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_helper`, {
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                setTaskNameOptions(data.taskNames || []);
+                setCategoryOptions(data.categories || []);
+            } catch (err) {
+                console.error('Failed to fetch task helper data:', err);
+            }
+        };
+        fetchTaskHelperData();
+    }, []);
 
     const handleChange = e => {
         const { name, value, type, checked } = e.target;
@@ -24,11 +42,6 @@ export default function CreateScheduleTask() {
             [name]: type === 'checkbox' ? checked : value,
         }));
     };
-
-    const tagsArray = formData.tags
-        .split(',')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0);
 
     const handleSubmit = async e => {
         e.preventDefault();
@@ -50,7 +63,6 @@ export default function CreateScheduleTask() {
             mood,
         } = formData;
 
-        const tags = category;
         const productivityScore = formData.productivityScore ? Number(formData.productivityScore) : null;
         const energyLevel = formData.energyLevel ? Number(formData.energyLevel) : 5;
 
@@ -58,7 +70,7 @@ export default function CreateScheduleTask() {
             taskName,
             description,
             category,
-            tags,
+            tags: category,
             startTime,
             endTime,
             isCompleted,
@@ -67,10 +79,8 @@ export default function CreateScheduleTask() {
             energyLevel
         };
 
-        console.log(payload);
-
         try {
-            const response = fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_create`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_create`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -79,9 +89,9 @@ export default function CreateScheduleTask() {
                 body: JSON.stringify(payload),
             });
 
-            const data = await response.data;
+            const data = await response.json();
 
-            if (response.status === 400 || response.status === 500) {
+            if (!response.ok) {
                 setError(data.error || 'Failed to create task');
             } else {
                 alert(`Registered successfully!`);
@@ -105,7 +115,6 @@ export default function CreateScheduleTask() {
         }
     };
 
-    // Auto-hide success message after 3s
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 13000);
@@ -120,19 +129,31 @@ export default function CreateScheduleTask() {
             {message && <p style={{ color: 'green' }}>{message}</p>}
 
             <form onSubmit={handleSubmit}>
+                {/* Task Name */}
                 <label>
                     Task Name*:<br />
+                    <select
+                        value={formData.taskName}
+                        onChange={e => setFormData(prev => ({ ...prev, taskName: e.target.value }))}
+                        style={{ width: '100%' }}
+                    >
+                        <option value="">-- Select a task or enter below --</option>
+                        {taskNameOptions.map((name, idx) => (
+                            <option key={idx} value={name}>{name}</option>
+                        ))}
+                    </select>
                     <input
                         type="text"
-                        name="taskName"
+                        placeholder="Or enter new task name"
                         value={formData.taskName}
                         onChange={handleChange}
-                        required
-                        style={{ width: '100%' }}
+                        name="taskName"
+                        style={{ width: '100%', marginTop: '4px' }}
                     />
                 </label>
                 <br /><br />
 
+                {/* Description */}
                 <label>
                     Description:<br />
                     <textarea
@@ -145,33 +166,31 @@ export default function CreateScheduleTask() {
                 </label>
                 <br /><br />
 
+                {/* Category */}
                 <label>
                     Category*:<br />
+                    <select
+                        value={formData.category}
+                        onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                        style={{ width: '100%' }}
+                    >
+                        <option value="">-- Select a category or enter below --</option>
+                        {categoryOptions.map((cat, idx) => (
+                            <option key={idx} value={cat}>{cat}</option>
+                        ))}
+                    </select>
                     <input
                         type="text"
-                        name="category"
+                        placeholder="Or enter new category"
                         value={formData.category}
                         onChange={handleChange}
-                        required
-                        placeholder="e.g. Work, Study, Exercise"
-                        style={{ width: '100%' }}
+                        name="category"
+                        style={{ width: '100%', marginTop: '4px' }}
                     />
                 </label>
                 <br /><br />
 
-                {/* <label>
-                    Tags (comma separated):<br />
-                    <input
-                        type="text"
-                        name="tags"
-                        value={formData.tags}
-                        onChange={handleChange}
-                        placeholder="e.g. urgent, client"
-                        style={{ width: '100%' }}
-                    />
-                </label>
-                <br /><br /> */}
-
+                {/* Start Time */}
                 <label>
                     Start Time*:<br />
                     <input
@@ -185,6 +204,7 @@ export default function CreateScheduleTask() {
                 </label>
                 <br /><br />
 
+                {/* End Time */}
                 <label>
                     End Time*:<br />
                     <input
@@ -198,17 +218,7 @@ export default function CreateScheduleTask() {
                 </label>
                 <br /><br />
 
-                {/* <label>
-                    Completed:<br />
-                    <input
-                        type="checkbox"
-                        name="isCompleted"
-                        checked={formData.isCompleted}
-                        onChange={handleChange}
-                    />
-                </label>
-                <br /><br /> */}
-
+                {/* Productivity Score */}
                 <label>
                     Productivity Score (0-10):<br />
                     <input
@@ -223,33 +233,7 @@ export default function CreateScheduleTask() {
                 </label>
                 <br /><br />
 
-                {/* <label>
-                    Mood:<br />
-                    <select name="mood" value={formData.mood} onChange={handleChange} style={{ width: '100%' }}>
-                        <option value="Happy">Happy</option>
-                        <option value="Neutral">Neutral</option>
-                        <option value="Sad">Sad</option>
-                        <option value="Tired">Tired</option>
-                        <option value="Motivated">Motivated</option>
-                        <option value="Stressed">Stressed</option>
-                    </select>
-                </label>
-                <br /><br />
-
-                <label>
-                    Energy Level (1-10):<br />
-                    <input
-                        type="number"
-                        name="energyLevel"
-                        value={formData.energyLevel}
-                        min="1"
-                        max="10"
-                        onChange={handleChange}
-                        style={{ width: '100%' }}
-                    />
-                </label>
-                <br /><br /> */}
-
+                {/* Submit */}
                 <button type="submit">Create Task</button>
             </form>
         </div>
