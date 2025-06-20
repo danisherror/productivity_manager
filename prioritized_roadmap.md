@@ -10,13 +10,13 @@ Focus: Make your app more user-friendly, responsive, and error-proof.
 
 * [x] **Fix any existing bugs** (task filtering, logout, edit inconsistencies).
 * [x] **Pagination & Search in AllTasks**.
-* [ ] **Add loading indicators** during data fetch.
+* [x] **Add loading indicators** during data fetch.
 * [ ] **Add error boundaries** to catch crashes gracefully.
-* [ ] **Improve layout with a sidebar or collapsible navbar** (especially for mobile).
+* [x] **Improve layout with a sidebar or collapsible navbar** (especially for mobile).
 
 #### 🚀 Quick Win
 
-* [ ] Add a **"Create Task" FAB** (Floating Action Button).
+* [x] Add a **"Create Task" FAB** (Floating Action Button).
 * [ ] Make **AllTasks responsive** (flex/grid on small screens).
 
 ---
