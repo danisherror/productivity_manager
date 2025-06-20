@@ -7,7 +7,15 @@ export default function KanbanBoardListPage() {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Select a Kanban Board</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Select a Kanban Board</h2>
+        <button
+          onClick={() => navigate('/kanban/create')}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          + Create Board
+        </button>
+      </div>
       <KanbanBoardList onSelect={(board) => navigate(`/kanban/board/${board._id}`)} />
     </div>
   );

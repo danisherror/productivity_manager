@@ -75,17 +75,11 @@ const Navbar = () => {
                 <Link to="/profile" className={linkClasses('/profile')}>
                   Profile
                 </Link>
-                <Link to="/CreateScheduleTask" className={linkClasses('/CreateScheduleTask')}>
-                  Create Task
-                </Link>
                 <Link to="/AllScheduleTasks" className={linkClasses('/AllScheduleTasks')}>
                   All Tasks
                 </Link>
                 <Link to="/analysis" className={linkClasses('/analysis')}>
                   Analysis
-                </Link>
-                <Link to="/kanban/create" className={linkClasses('/kanban/create')}>
-                  Create Board
                 </Link>
                 <Link to="/kanban" className={linkClasses('/kanban')}>
                   Kanban Board
