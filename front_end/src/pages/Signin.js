@@ -33,7 +33,17 @@ function Signin() {
       if (response.status === 200 || response.status === 201) {
         alert(`Registered successfully!`);
         navigate('/profile');
-      } else {
+      }
+      else if(response.status === 403)
+        {
+          alert('Email is not verified. Verification email resent. Please check your email.')
+        } 
+         else if(response.status === 405)
+        {
+          alert('Email is not verified. Please check your email for verification link.')
+        } 
+      else 
+      {
         alert('Error registering. Please try again.');
       }
     } catch (error) {

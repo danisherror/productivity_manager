@@ -9,7 +9,6 @@ router.route('/logout').post(logout)
 router.route('/userProfile').get(isLoggedIn,userProfile)
 router.route('/userRecord').get(isLoggedIn,getUserRecord)
 router.route('/verify-email').get(verifyEmail)
-router.route('/resend-verification-email').get(resendVerificationEmail)
 
 router.get('/me', isLoggedIn, (req, res) => {
   res.status(200).json({ user: req.user });

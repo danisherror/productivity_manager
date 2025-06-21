@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const UserRecord = require('../models/UserRecord');
 const sendEmail = require('../utils/sendEmail');
+const sendVerificationEmail = require('../utils/sendVerificationEmail');
 const jwt = require('jsonwebtoken');
 const BigPromise = require('../middlewares/bigPromise')
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -54,10 +55,10 @@ exports.signin = async (req, res) => {
       return res.status(400).json({ message: 'Please provide username/email and password.' });
     }
 
-    // Find user by email or username, and include password & emailVerified fields
-    let user = await User.findOne({ email: identifier }).select('+password +emailVerified');
+    // Find user by email or username
+    let user = await User.findOne({ email: identifier }).select('+password +emailVerified +emailVerificationToken +emailVerificationExpire');
     if (!user) {
-      user = await User.findOne({ username: identifier }).select('+password +emailVerified');
+      user = await User.findOne({ username: identifier }).select('+password +emailVerified +emailVerificationToken +emailVerificationExpire');
       if (!user) {
         return res.status(401).json({ message: 'Invalid username/email' });
       }
@@ -69,21 +70,25 @@ exports.signin = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    // Check if email is verified
+    // Check email verification
     if (!user.emailVerified) {
-      // Resend verification email
-      await sendVerificationEmail(user);
+      // Check if token exists and not expired
+      const tokenExpired = !user.emailVerificationExpire || user.emailVerificationExpire < Date.now();
 
-      return res.status(403).json({
-        message: 'Email not verified. Verification email has been sent again. Please verify your email before signing in.',
-      });
+      if (tokenExpired) {
+        // Send new verification email
+        await sendVerificationEmail(user);
+        return res.status(403).json({ message: 'Email is not verified. Verification email resent. Please check your email.' });
+      } else {
+        return res.status(405).json({ message: 'Email is not verified. Please check your email for verification link.' });
+      }
     }
 
     // Generate token and set cookie
     const token = user.getJwtToken();
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // secure in production only
+      secure: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
