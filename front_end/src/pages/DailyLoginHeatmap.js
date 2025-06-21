@@ -36,7 +36,7 @@ export default function DailyLoginHeatmap() {
           credentials: 'include',
         });
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
         if (res.ok && Array.isArray(data.dates)) {
           const formattedDates = data.dates.map(d => new Date(d).toISOString().slice(0, 10));
           setLoginDates(formattedDates);

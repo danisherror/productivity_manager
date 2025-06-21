@@ -206,3 +206,29 @@ exports.updatePassword = BigPromise(async (req, res) => {
 
   res.status(200).json({ success: true, message: 'Password updated successfully' });
 });
+
+exports.verifyPassword = async (req, res) => {
+  try {
+    const { currentPassword } = req.body;
+
+    if (!currentPassword) {
+      return res.status(400).json({ message: 'Current password is required' });
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isMatch = await user.isValidatedPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Incorrect current password' });
+    }
+
+    // Password verified successfully
+    res.status(200).json({ message: 'Password verified' });
+  } catch (error) {
+    console.error('verifyPassword error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
