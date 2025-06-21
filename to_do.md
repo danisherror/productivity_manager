@@ -26,3 +26,4 @@
 - [ ] (later)make the start date as when the user has created the account in heatmap.
 - [x] Email varification and re-send
 - [x] Change the password
+- [ ] forget password through mail
