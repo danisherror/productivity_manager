@@ -268,11 +268,10 @@ export default function KanbanBoard({ board }) {
                 setDraggedTaskId(null);
                 setDraggedOverColumn(null);
               }}
-              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] relative ${
-                draggedOverColumn === col.title ? 'bg-blue-100' : ''
-              }`}
+              className={`bg-gray-100 p-4 rounded shadow relative ${draggedOverColumn === col.title ? 'bg-blue-100' : ''
+                }`}
             >
-              <h3 className="font-semibold mb-3 flex justify-between items-center">
+              <div className="font-semibold mb-3 flex justify-between items-center">
                 <span>{col.title}</span>
                 <button
                   onClick={() => deleteColumn(col._id, col.title)}
@@ -281,53 +280,56 @@ export default function KanbanBoard({ board }) {
                 >
                   &times;
                 </button>
-              </h3>
+              </div>
 
-              {col.items.length === 0 && (
-                <p className="text-gray-400 italic">No tasks</p>
-              )}
+              <div className="max-h-[400px] overflow-y-auto pr-1 space-y-2">
+                {col.items.length === 0 && (
+                  <p className="text-gray-400 italic">No tasks</p>
+                )}
 
-              {col.items.map((task) => (
-                <div
-                  key={task._id}
-                  draggable
-                  onDragStart={(e) => {
-                    setDraggedTaskId(task._id.toString());
-                    e.dataTransfer.setData('text/plain', task._id.toString());
-                  }}
-                  className="bg-white p-3 mb-2 rounded shadow cursor-pointer hover:bg-gray-50 relative"
-                >
-                  <button
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      const confirmDelete = window.confirm(`Are you sure you want to delete task "${task.title}"?`);
-                      if (!confirmDelete) return;
-
-                      try {
-                        await api.delete(`/kanban_task/${board._id}/tasks/${task._id}`);
-                        await fetchTasks();
-                      } catch (err) {
-                        console.error('Error deleting task:', err);
-                        alert('Failed to delete task');
-                      }
+                {col.items.map((task) => (
+                  <div
+                    key={task._id}
+                    draggable
+                    onDragStart={(e) => {
+                      setDraggedTaskId(task._id.toString());
+                      e.dataTransfer.setData('text/plain', task._id.toString());
                     }}
-                    className="absolute top-1 right-2 text-red-500 hover:text-red-700 font-bold text-lg"
-                    title="Delete task"
+                    className="bg-white p-3 rounded shadow cursor-pointer hover:bg-gray-50 relative"
                   >
-                    &times;
-                  </button>
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        const confirmDelete = window.confirm(`Are you sure you want to delete task "${task.title}"?`);
+                        if (!confirmDelete) return;
 
-                  <div onClick={() => {
-                    setModalTask(task);
-                    setIsCreateMode(false);
-                  }}>
-                    <p className="font-medium">{task.title}</p>
-                    <p className="text-sm text-gray-500">Priority: {task.priority}</p>
-                    <p className="text-xs text-gray-400 truncate">ID: {task._id}</p>
+                        try {
+                          await api.delete(`/kanban_task/${board._id}/tasks/${task._id}`);
+                          await fetchTasks();
+                        } catch (err) {
+                          console.error('Error deleting task:', err);
+                          alert('Failed to delete task');
+                        }
+                      }}
+                      className="absolute top-1 right-2 text-red-500 hover:text-red-700 font-bold text-lg"
+                      title="Delete task"
+                    >
+                      &times;
+                    </button>
+
+                    <div onClick={() => {
+                      setModalTask(task);
+                      setIsCreateMode(false);
+                    }}>
+                      <p className="font-medium">{task.title}</p>
+                      <p className="text-sm text-gray-500">Priority: {task.priority}</p>
+                      <p className="text-xs text-gray-400 truncate">ID: {task._id}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
           ))}
         </div>
       )}
