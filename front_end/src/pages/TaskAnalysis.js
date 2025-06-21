@@ -171,6 +171,32 @@ const TaskAnalysis = () => {
               <Tooltip />
             </PieChart>
           </div>
+          <div className="overflow-x-auto">
+            <h3 className="text-xl font-semibold mb-4 text-center">Time Spent Breakdown (%)</h3>
+            <table className="min-w-full border border-gray-300 rounded-md overflow-hidden text-sm">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="py-2 px-4 text-left">%</th>
+                  <th className="py-2 px-4 text-left">{paramLabels[selectedParam]}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data
+                  .sort((a, b) => b.minutes - a.minutes)
+                  .map((item, i) => {
+                    const total = data.reduce((sum, d) => sum + d.minutes, 0);
+                    const percentage = ((item.minutes / total) * 100).toFixed(1);
+                    return (
+                      <tr key={i} className="border-t border-gray-200">
+                        <td className="py-2 px-4">{percentage}%</td>
+                        <td className="py-2 px-4">{item.name}</td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+
         </div>
       )}
     </div>
