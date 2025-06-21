@@ -60,21 +60,6 @@ function UserProfile() {
         </p>
       </div>
 
-      <div className="mt-8 flex justify-center space-x-6">
-        <Link
-          to="/CreateScheduleTask"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
-          Create Task
-        </Link>
-        <Link
-          to="/AllScheduleTasks"
-          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
-        >
-          See All Tasks
-        </Link>
-      </div>
-
       {/* Productivity Heatmap embedded here */}
       <div className="mt-12">
         <ProductivityHeatmap />
