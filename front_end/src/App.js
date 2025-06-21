@@ -12,6 +12,7 @@ import TaskAnalysis from './pages/TaskAnalysis';
 import KanbanBoardListPage from './pages/KanbanBoardListPage';
 import KanbanBoardPage from './pages/KanbanBoardPage';
 import CreateBoard from './pages/CreateBoard'; 
+import CreateDailyProductivity from './pages/CreateDailyProductivity';
 function App() {
   return (
     <Router>
@@ -28,6 +29,8 @@ function App() {
          <Route path="/kanban" element={<KanbanBoardListPage />} />
         <Route path="/kanban/board/:id" element={<KanbanBoardPage />} />
         <Route path="/kanban/create" element={<CreateBoard />} />
+
+        <Route path="/daily-productivity/create" element={<CreateDailyProductivity />} />
       </Routes>
     </Router>
   );

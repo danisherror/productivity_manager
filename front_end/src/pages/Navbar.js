@@ -84,6 +84,9 @@ const Navbar = () => {
                 <Link to="/kanban" className={linkClasses('/kanban')}>
                   Kanban Board
                 </Link>
+                <Link to="/daily-productivity/create" className={linkClasses('/daily-productivity/create')}>
+                  daily productivity
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="block w-full px-4 py-2 my-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200"
