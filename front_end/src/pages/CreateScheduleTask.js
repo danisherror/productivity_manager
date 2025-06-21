@@ -5,13 +5,8 @@ export default function CreateScheduleTask() {
     taskName: '',
     description: '',
     category: '',
-    tags: '',
     startTime: '',
     endTime: '',
-    isCompleted: true,
-    productivityScore: 0,
-    mood: 'Neutral',
-    energyLevel: 5,
   });
 
   const [taskNameOptions, setTaskNameOptions] = useState([]);
@@ -57,9 +52,7 @@ export default function CreateScheduleTask() {
       return;
     }
 
-    const { taskName, description, category, startTime, endTime, isCompleted, mood } = formData;
-    const productivityScore = formData.productivityScore ? Number(formData.productivityScore) : null;
-    const energyLevel = formData.energyLevel ? Number(formData.energyLevel) : 5;
+    const { taskName, description, category, startTime, endTime } = formData;
 
     const payload = {
       taskName,
@@ -68,10 +61,10 @@ export default function CreateScheduleTask() {
       tags: category,
       startTime,
       endTime,
-      isCompleted,
-      productivityScore,
-      mood,
-      energyLevel,
+      isCompleted: true,
+      productivityScore: 0,
+      mood: 'Neutral',
+      energyLevel: 5,
     };
 
     try {
@@ -93,13 +86,8 @@ export default function CreateScheduleTask() {
           taskName: '',
           description: '',
           category: '',
-          tags: '',
           startTime: '',
           endTime: '',
-          isCompleted: false,
-          productivityScore: '',
-          mood: 'Neutral',
-          energyLevel: 5,
         });
       }
     } catch (err) {
