@@ -24,5 +24,5 @@
 - [x] create description on kanban board
 - [x] sort the dates in the productivity heatmap.
 - [ ] (later)make the start date as when the user has created the account in heatmap.
-- [ ] Email varification and re-send
-- [ ] Reset the password
+- [x] Email varification and re-send
+- [x] Change the password

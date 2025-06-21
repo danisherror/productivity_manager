@@ -5,7 +5,15 @@ const sendVerificationEmail = require('../utils/sendVerificationEmail');
 const jwt = require('jsonwebtoken');
 const BigPromise = require('../middlewares/bigPromise')
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
-
+function isStrongPassword(password) {
+  const minLength = password.length >= 8;
+  const maxLength = password.length <= 20;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*()_\+\-=\[\]{}|;:,.<>?]/.test(password);
+  return minLength && maxLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
+}
 exports.signup = async (req, res) => {
   try {
     const { username, name, email, password } = req.body;
@@ -13,7 +21,10 @@ exports.signup = async (req, res) => {
     if (!username || !name || !email || !password) {
       return res.status(400).json({ message: 'Please provide all required fields.' });
     }
-
+    if(!isStrongPassword(password))
+    {
+      return res.status(400).json({ message: 'Please provide all required fields.' });
+    }
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'Email already registered.' });
 
