@@ -105,7 +105,7 @@ export default function KanbanBoard({ board }) {
       const res = await api.delete(`/kanban_board__delete/${board._id}`);
       if (res.status === 200) {
         alert('Board deleted successfully');
-        window.location.href = '/kanban'; // or use useNavigate()
+        window.location.href = '/kanban';
       } else {
         alert('Failed to delete board');
       }
@@ -121,8 +121,9 @@ export default function KanbanBoard({ board }) {
   }));
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between mb-4 items-start">
+    <div className="p-4 max-w-full overflow-x-auto">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between mb-4 gap-4">
         <div className="flex flex-col max-w-md">
           <h2 className="text-2xl font-bold">{board.title}</h2>
           {board.description && (
@@ -131,7 +132,7 @@ export default function KanbanBoard({ board }) {
             </div>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row gap-2">
           <button
             onClick={() => {
               setModalTask(null);
@@ -141,7 +142,6 @@ export default function KanbanBoard({ board }) {
           >
             + New Task
           </button>
-
           <button
             onClick={deleteBoard}
             className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
@@ -151,13 +151,14 @@ export default function KanbanBoard({ board }) {
         </div>
       </div>
 
-      <div className="mb-4 flex gap-2 items-center">
+      {/* Add Column */}
+      <div className="mb-4 flex flex-col md:flex-row gap-2 items-start md:items-center">
         <input
           type="text"
           placeholder="New column name"
           value={newColumnName}
           onChange={(e) => setNewColumnName(e.target.value)}
-          className="border border-gray-300 rounded px-2 py-1"
+          className="border border-gray-300 rounded px-2 py-1 w-full md:w-auto"
         />
         <button
           onClick={addNewColumn}
@@ -167,10 +168,11 @@ export default function KanbanBoard({ board }) {
         </button>
       </div>
 
+      {/* Task Columns */}
       {loading ? (
         <p>Loading tasks...</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible pb-2">
           {grouped.map((col) => (
             <div
               key={col._id}
@@ -202,7 +204,9 @@ export default function KanbanBoard({ board }) {
                 setDraggedTaskId(null);
                 setDraggedOverColumn(null);
               }}
-              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] relative ${draggedOverColumn === col.title ? 'bg-blue-100' : ''}`}
+              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] w-[300px] flex-shrink-0 md:w-auto relative ${
+                draggedOverColumn === col.title ? 'bg-blue-100' : ''
+              }`}
             >
               <h3 className="font-semibold mb-3 flex justify-between items-center">
                 <span>{col.title}</span>
