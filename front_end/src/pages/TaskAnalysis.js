@@ -171,31 +171,35 @@ const TaskAnalysis = () => {
               <Tooltip />
             </PieChart>
           </div>
-          <div className="overflow-x-auto">
-            <h3 className="text-xl font-semibold mb-4 text-center">Time Spent Breakdown (%)</h3>
-            <table className="min-w-full border border-gray-300 rounded-md overflow-hidden text-sm">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="py-2 px-4 text-left">%</th>
-                  <th className="py-2 px-4 text-left">{paramLabels[selectedParam]}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data
-                  .sort((a, b) => b.minutes - a.minutes)
-                  .map((item, i) => {
-                    const total = data.reduce((sum, d) => sum + d.minutes, 0);
-                    const percentage = ((item.minutes / total) * 100).toFixed(1);
-                    return (
-                      <tr key={i} className="border-t border-gray-200">
-                        <td className="py-2 px-4">{percentage}%</td>
-                        <td className="py-2 px-4">{item.name}</td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
+          <div className="md:col-span-2 mt-8">
+            <h3 className="text-xl font-semibold mb-4 text-center">⏱️ Time Spent Breakdown by {paramLabels[selectedParam]}</h3>
+            <div className="space-y-3">
+              {data
+                .sort((a, b) => b.minutes - a.minutes)
+                .map((item, i) => {
+                  const total = data.reduce((sum, d) => sum + d.minutes, 0);
+                  const percentage = ((item.minutes / total) * 100).toFixed(1);
+                  const barColor = COLORS[i % COLORS.length];
+                  return (
+                    <div key={i} className="flex items-center gap-4">
+                      <div className="w-24 text-sm font-medium text-gray-700 truncate">{item.name}</div>
+                      <div className="relative w-full h-6 bg-gray-200 rounded-md overflow-hidden">
+                        <div
+                          className="h-full rounded-md text-white text-xs font-semibold flex items-center justify-center"
+                          style={{
+                            width: `${percentage}%`,
+                            backgroundColor: barColor,
+                          }}
+                        >
+                          {percentage}%
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
+
 
         </div>
       )}
