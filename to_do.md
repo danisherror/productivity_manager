@@ -21,6 +21,6 @@
   - Event after the task is deleted, the date will not be removed from the list.
   - Add this in middleware, that will track, on which day you have login
     - and for other day, think of something.
-- [ ] create description on kanban board
-- [ ] sort the dates in the productivity heatmap.
-- [ ] make the start date as when the user has created the account in heatmap.
+- [x] create description on kanban board
+- [x] sort the dates in the productivity heatmap.
+- [ ] (later)make the start date as when the user has created the account in heatmap.
