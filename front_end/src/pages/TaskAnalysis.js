@@ -8,20 +8,12 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28BF6', '#F67280'
 
 const parameters = [
   'category',
-  'tags',
-  'mood',
-  'isCompleted',
   'taskName',
-  'productivityScore'
 ];
 
 const paramLabels = {
   category: 'Category',
-  tags: 'Tags',
-  mood: 'Mood',
-  isCompleted: 'Completion Status',
   taskName: 'Task Name',
-  productivityScore: 'Productivity Score',
 };
 
 const TaskAnalysis = () => {
@@ -75,12 +67,7 @@ const TaskAnalysis = () => {
         let key;
         switch (param) {
           case 'category': key = t.category || 'Uncategorized'; break;
-          case 'mood': key = t.mood || 'Unknown'; break;
-          case 'isCompleted': key = t.isCompleted ? 'Completed' : 'Pending'; break;
           case 'taskName': key = t.taskName || 'No Name'; break;
-          case 'productivityScore':
-            key = t.productivityScore != null ? `Score ${t.productivityScore}` : 'No Score';
-            break;
           default: key = 'Unknown';
         }
         summary[key] = (summary[key] || 0) + duration;
