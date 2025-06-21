@@ -139,7 +139,7 @@ const TaskAnalysis = () => {
 
       {!loading && !error && data.length > 0 && (
         <div className="grid md:grid-cols-2 gap-10 mt-8">
-          <div className="overflow-x-auto">
+          <div className="bg-white shadow rounded-lg p-6 overflow-x-auto flex flex-col items-center">
             <h3 className="text-xl font-semibold mb-4 text-center">Bar Chart</h3>
             <BarChart width={500} height={300} data={data}>
               <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-45} textAnchor="end" />
@@ -153,7 +153,7 @@ const TaskAnalysis = () => {
             </BarChart>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="bg-white shadow rounded-lg p-6 overflow-x-auto flex flex-col items-center">
             <h3 className="text-xl font-semibold mb-4 text-center">Pie Chart</h3>
             <PieChart width={400} height={300}>
               <Pie
@@ -172,8 +172,13 @@ const TaskAnalysis = () => {
               <Tooltip />
             </PieChart>
           </div>
-          <TaskAnalysisAnimatedBars data={data} />
+
+          <div className="bg-white shadow rounded-lg p-6 flex flex-col items-center w-full md:col-span-2">
+            <h3 className="text-xl font-semibold mb-4 text-center">Animated Bars</h3>
+            <TaskAnalysisAnimatedBars data={data} />
+          </div>
         </div>
+
       )}
     </div>
   );
