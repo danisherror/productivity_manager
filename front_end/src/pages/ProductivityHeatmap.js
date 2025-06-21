@@ -83,7 +83,7 @@ export default function ProductivityHeatmap() {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-6">
             {/* Sidebar with buttons */}
-            <aside className="md:w-40 mb-6 md:mb-0"> {/* narrower width */}
+            <aside className="md:w-40 mb-6 md:mb-0 max-h-96 overflow-y-auto">
                 <h3 className="text-lg font-semibold mb-4">Select Period</h3>
                 <div className="flex flex-col space-y-3">
                     {periods.map((period, index) => (
