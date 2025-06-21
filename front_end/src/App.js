@@ -17,6 +17,8 @@ import DailyProductivityAll from './pages/AllDailyProductivity';
 import EditDailyProductivity from './pages/EditDailyProductivity';
 import ProductivityHeatmap from './pages/ProductivityHeatmap';
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -44,6 +46,8 @@ function App() {
           <Route path="/daily-productivity/edit/:id" element={<EditDailyProductivity />} />
           <Route path="/heatmap" element={<ProductivityHeatmap />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         </Routes>
       </div>
     </Router>

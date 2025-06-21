@@ -5,6 +5,7 @@ const sendVerificationEmail = require('../utils/sendVerificationEmail');
 const jwt = require('jsonwebtoken');
 const BigPromise = require('../middlewares/bigPromise')
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+const crypto = require('crypto');
 function isStrongPassword(password) {
   const minLength = password.length >= 8;
   const maxLength = password.length <= 20;
@@ -240,6 +241,80 @@ exports.verifyPassword = async (req, res) => {
     res.status(200).json({ message: 'Password verified' });
   } catch (error) {
     console.error('verifyPassword error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ message: 'Email is required' });
+
+  const user = await User.findOne({ email });
+  if (!user)
+    return res.status(404).json({ message: 'User with this email does not exist' });
+
+  const resetToken = user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+
+  const resetURL = `${process.env.front_end_url}/reset-password/${resetToken}`;
+
+  const message = `You requested a password reset. Click here: ${resetURL}\n\nIf you did not request this, ignore this email.`;
+
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: 'Password Reset Request',
+      text: message,
+    });
+
+    res.status(200).json({ message: 'Reset link sent to your email' });
+  } catch (err) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    console.error(err);
+    res.status(500).json({ message: 'Email could not be sent' });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+    // console.log(req.body) 
+    if(!isStrongPassword(password))
+    {
+      return res.status(400).json({ message: 'New password is required.' });
+    }
+    if (!password || password.trim() === '') {
+      return res.status(400).json({ message: 'New password is required.' });
+    }
+
+    const resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    }).select('+password');
+
+    if (!user) {
+      return res.status(400).json({ message: 'Reset token is invalid or expired.' });
+    }
+
+    user.password = password.trim();
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

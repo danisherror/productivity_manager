@@ -54,7 +54,7 @@ function Signin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Sign Up to eReside</h2>
+        <h2 className="text-3xl font-semibold text-center text-gray-800 mb-6">Sigin Up to eReside</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -100,9 +100,15 @@ function Signin() {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link to="/signin" className="text-indigo-600 hover:text-indigo-800 font-medium">
-            Sign in
+          Don't have an account?{' '}
+          <Link to="/signup" className="text-indigo-600 hover:text-indigo-800 font-medium">
+            Sign up
+          </Link>
+        </p>
+        <p className="mt-6 text-center text-sm text-gray-600">
+          Forgot Password?{' '}
+          <Link to="/forgot-password" className="text-indigo-600 hover:text-indigo-800 font-medium">
+            Forgot Password
           </Link>
         </p>
       </div>
