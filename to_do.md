@@ -19,4 +19,4 @@
   - Here date can be the date on the day you have added the task for that day or previous day.
     By doing this heatmap will take current date and day on which you have completed the task.
   - Event after the task is deleted, the date will not be removed from the list.
-  
+- [ ] create description on kanban board
