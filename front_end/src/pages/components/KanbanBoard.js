@@ -17,7 +17,8 @@ export default function KanbanBoard({ board }) {
   const [isEditingBoard, setIsEditingBoard] = useState(false);
   const [editedTitle, setEditedTitle] = useState(board.title);
   const [editedDescription, setEditedDescription] = useState(board.description || '');
-
+  const [editingColumnId, setEditingColumnId] = useState(null);
+  const [editedColumnName, setEditedColumnName] = useState('');
   const fetchTasks = async () => {
     setLoading(true);
     try {
@@ -272,14 +273,65 @@ export default function KanbanBoard({ board }) {
                 }`}
             >
               <div className="font-semibold mb-3 flex justify-between items-center">
-                <span>{col.title}</span>
-                <button
-                  onClick={() => deleteColumn(col._id, col.title)}
-                  className="text-red-600 hover:text-red-800 text-lg font-bold"
-                  title="Delete column"
-                >
-                  &times;
-                </button>
+                {editingColumnId === col._id ? (
+                  <div className="flex items-center gap-2 w-full">
+                    <input
+                      className="border rounded px-1 py-0.5 text-sm w-full"
+                      value={editedColumnName}
+                      onChange={(e) => setEditedColumnName(e.target.value)}
+                    />
+                    <button
+                      onClick={async () => {
+                        try {
+                          await api.put(`/kanban_board/${board._id}/columns/${col._id}`, {
+                            title: editedColumnName,
+                          });
+                          setEditingColumnId(null);
+                          setEditedColumnName('');
+                          await fetchBoardColumns();
+                        } catch (err) {
+                          console.error('Error renaming column:', err);
+                          alert('Failed to rename column');
+                        }
+                      }}
+                      className="text-green-600 hover:text-green-800 text-sm"
+                    >
+                      ✅
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingColumnId(null);
+                        setEditedColumnName('');
+                      }}
+                      className="text-gray-500 hover:text-gray-700 text-sm"
+                    >
+                      ✖
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <span>{col.title}</span>
+                    <div className="flex gap-2 items-center">
+                      <button
+                        onClick={() => {
+                          setEditingColumnId(col._id);
+                          setEditedColumnName(col.title);
+                        }}
+                        title="Edit column"
+                        className="text-blue-600 hover:text-blue-800 text-sm"
+                      >
+                        ✎
+                      </button>
+                      <button
+                        onClick={() => deleteColumn(col._id, col.title)}
+                        className="text-red-600 hover:text-red-800 text-lg font-bold"
+                        title="Delete column"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="max-h-[400px] overflow-y-auto pr-1 space-y-2">

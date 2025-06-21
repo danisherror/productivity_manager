@@ -66,3 +66,51 @@ exports.delete = async (req, res) => {
   }
 };
 
+
+
+// Update column title or other fields
+exports.update = async (req, res) => {
+  try {
+    const { boardId, columnId } = req.params;
+    const { title, wipLimit } = req.body;
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ error: 'Column title is required' });
+    }
+
+    const board = await KanbanBoard.findById(boardId);
+    if (!board) return res.status(404).json({ error: 'Board not found' });
+
+    const column = board.columns.id(columnId);
+    if (!column) return res.status(404).json({ error: 'Column not found' });
+
+    // Check for duplicate column title (excluding the current one)
+    const isDuplicate = board.columns.some(
+      (col) => col.title === title.trim() && col._id.toString() !== columnId
+    );
+    if (isDuplicate) {
+      return res.status(400).json({ error: 'Column with this title already exists' });
+    }
+
+    const oldTitle = column.title;
+
+    // Update column fields
+    column.title = title.trim();
+    if (wipLimit !== undefined) {
+      column.wipLimit = wipLimit;
+    }
+
+    await board.save();
+
+    // Update tasks with the new column title
+    await KanbanTask.updateMany(
+      { boardId, columnTitle: oldTitle },
+      { $set: { columnTitle: title.trim() } }
+    );
+
+    res.status(200).json({ message: 'Column updated successfully', column });
+  } catch (err) {
+    console.error('Error updating column:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
