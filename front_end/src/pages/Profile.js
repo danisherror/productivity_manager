@@ -1,8 +1,7 @@
-// src/pages/Profile.js
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import ProductivityHeatmap from './ProductivityHeatmap';
 import DailyLoginHeatmap from './DailyLoginHeatmap';
+
 function UserProfile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,6 +56,14 @@ function UserProfile() {
         </p>
         <p>
           <strong className="font-semibold">Email:</strong> {user.email}
+        </p>
+        <p>
+          <strong className="font-semibold">Email Verified:</strong>{' '}
+          {user.emailVerified ? (
+            <span className="text-green-600 font-semibold">Verified ✅</span>
+          ) : (
+            <span className="text-red-600 font-semibold">Not Verified ❌</span>
+          )}
         </p>
       </div>
 

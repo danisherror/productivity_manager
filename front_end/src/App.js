@@ -16,7 +16,7 @@ import CreateDailyProductivity from './pages/CreateDailyProductivity';
 import DailyProductivityAll from './pages/AllDailyProductivity';
 import EditDailyProductivity from './pages/EditDailyProductivity';
 import ProductivityHeatmap from './pages/ProductivityHeatmap';
-
+import VerifyEmailPage from './pages/VerifyEmailPage';
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -43,6 +43,7 @@ function App() {
           <Route path="/daily-productivity" element={<DailyProductivityAll />} />
           <Route path="/daily-productivity/edit/:id" element={<EditDailyProductivity />} />
           <Route path="/heatmap" element={<ProductivityHeatmap />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Routes>
       </div>
     </Router>

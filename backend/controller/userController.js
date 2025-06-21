@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const UserRecord = require('../models/UserRecord');
+const sendEmail = require('../utils/sendEmail');
 const jwt = require('jsonwebtoken');
 const BigPromise = require('../middlewares/bigPromise')
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -12,38 +13,40 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: 'Please provide all required fields.' });
     }
 
-    const existingUser = await User.findOne({ email: email });
+    const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'Email already registered.' });
 
-    const existingusername = await User.findOne({ username: username });
-    if (existingusername) return res.status(400).json({ message: 'username already registered.' });
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) return res.status(400).json({ message: 'Username already registered.' });
 
-    const user = await User.create({
-      username: username,
-      name: name,
-      email: email,
-      password: password
-    });
-    const token = user.getJwtToken();
+    const user = await User.create({ username, name, email, password });
 
-    // Set cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // use HTTPS in prod
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+    // Generate token for email verification
+    const verificationToken = jwt.sign({ id: user._id }, process.env.EMAIL_SECRET, { expiresIn: '1d' });
+
+    const verificationURL = `${process.env.front_end_url}/verify-email?token=${verificationToken}`;
+    try{
+    // Send email
+    await sendEmail({
+      to: user.email,
+      subject: 'Verify Your Email',
+      text: `Hi ${user.name}, please verify your email by clicking this link: ${verificationURL}`,
     });
 
     res.status(201).json({
       success: true,
-      user: user.toJSON(),
+      message: 'Signup successful. Please verify your email.',
     });
+  }
+  catch (error) {
+    console.error('Signup 11error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
   } catch (error) {
     console.error('Signup error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 exports.signin = async (req, res) => {
   try {
     const { identifier, password } = req.body;
@@ -51,10 +54,10 @@ exports.signin = async (req, res) => {
       return res.status(400).json({ message: 'Please provide username/email and password.' });
     }
 
-    // Try to find user by email first, then by username
-    let user = await User.findOne({ email: identifier }).select('+password');
+    // Find user by email or username, and include password & emailVerified fields
+    let user = await User.findOne({ email: identifier }).select('+password +emailVerified');
     if (!user) {
-      user = await User.findOne({ username: identifier }).select('+password');
+      user = await User.findOne({ username: identifier }).select('+password +emailVerified');
       if (!user) {
         return res.status(401).json({ message: 'Invalid username/email' });
       }
@@ -64,6 +67,16 @@ exports.signin = async (req, res) => {
     const isMatch = await user.isValidatedPassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials.' });
+    }
+
+    // Check if email is verified
+    if (!user.emailVerified) {
+      // Resend verification email
+      await sendVerificationEmail(user);
+
+      return res.status(403).json({
+        message: 'Email not verified. Verification email has been sent again. Please verify your email before signing in.',
+      });
     }
 
     // Generate token and set cookie
@@ -138,5 +151,26 @@ exports.getUserRecord = async (req, res) => {
   } catch (error) {
     console.error('Error fetching user record:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) return res.status(400).json({ message: 'Missing token' });
+
+    const decoded = jwt.verify(token, process.env.EMAIL_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (user.emailVerified) return res.status(400).json({ message: 'Email already verified' });
+
+    user.emailVerified = true;
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Email verified successfully' });
+  } catch (error) {
+    console.error('Verify email error:', error);
+    res.status(400).json({ message: 'Invalid or expired token' });
   }
 };
