@@ -6,10 +6,7 @@ import {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28BF6', '#F67280'];
 
-const parameters = [
-  'category',
-  'taskName',
-];
+const parameters = ['category', 'taskName'];
 
 const paramLabels = {
   category: 'Category',
@@ -83,33 +80,35 @@ const TaskAnalysis = () => {
       <h2 className="text-2xl font-bold mb-6 text-center">📊 Task Analysis</h2>
 
       <div className="flex flex-col md:flex-row gap-6 mb-6 items-center justify-center">
-        <div>
+        <div className="min-w-[250px] w-full">
           <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
           <input
             id="startDate"
             type="date"
             value={startDate}
             onChange={e => setStartDate(e.target.value)}
-            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-1.5 shadow-sm focus:ring focus:ring-blue-200"
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:ring focus:ring-blue-200"
           />
         </div>
-        <div>
+
+        <div className="min-w-[250px] w-full">
           <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
           <input
             id="endDate"
             type="date"
             value={endDate}
             onChange={e => setEndDate(e.target.value)}
-            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-1.5 shadow-sm focus:ring focus:ring-blue-200"
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:ring focus:ring-blue-200"
           />
         </div>
-        <div>
+
+        <div className="min-w-[250px] w-full">
           <label htmlFor="paramSelect" className="block text-sm font-medium text-gray-700">Parameter</label>
           <select
             id="paramSelect"
             value={selectedParam}
             onChange={e => setSelectedParam(e.target.value)}
-            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-1.5 shadow-sm focus:ring focus:ring-blue-200"
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 shadow-sm focus:ring focus:ring-blue-200"
           >
             {parameters.map(param => (
               <option key={param} value={param}>{paramLabels[param]}</option>
@@ -139,10 +138,10 @@ const TaskAnalysis = () => {
 
       {!loading && !error && data.length > 0 && (
         <div className="grid md:grid-cols-2 gap-10 mt-8">
-          <div>
+          <div className="overflow-x-auto">
             <h3 className="text-xl font-semibold mb-4 text-center">Bar Chart</h3>
             <BarChart width={500} height={300} data={data}>
-              <XAxis dataKey="name" />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-45} textAnchor="end" />
               <YAxis />
               <Tooltip />
               <Legend />
@@ -153,7 +152,7 @@ const TaskAnalysis = () => {
             </BarChart>
           </div>
 
-          <div>
+          <div className="overflow-x-auto">
             <h3 className="text-xl font-semibold mb-4 text-center">Pie Chart</h3>
             <PieChart width={400} height={300}>
               <Pie
