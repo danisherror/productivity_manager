@@ -1,5 +1,7 @@
+// src/pages/Profile.js
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ProductivityHeatmap from './ProductivityHeatmap';
 
 function UserProfile() {
   const [user, setUser] = useState(null);
@@ -44,7 +46,7 @@ function UserProfile() {
     return <p className="text-gray-600 font-medium text-center mt-6">No user found.</p>;
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+    <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">User Profile</h1>
       <div className="space-y-4 text-gray-700">
         <p>
@@ -71,6 +73,11 @@ function UserProfile() {
         >
           See All Tasks
         </Link>
+      </div>
+
+      {/* Productivity Heatmap embedded here */}
+      <div className="mt-12">
+        <ProductivityHeatmap />
       </div>
     </div>
   );
