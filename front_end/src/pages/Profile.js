@@ -7,6 +7,13 @@ function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // For change password form
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [changePassLoading, setChangePassLoading] = useState(false);
+  const [changePassError, setChangePassError] = useState('');
+  const [changePassSuccess, setChangePassSuccess] = useState('');
+
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/userProfile`, {
       method: 'GET',
@@ -28,6 +35,44 @@ function UserProfile() {
         setLoading(false);
       });
   }, []);
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setChangePassError('');
+    setChangePassSuccess('');
+    setChangePassLoading(true);
+
+    if (!currentPassword || !newPassword) {
+      setChangePassError('Please fill in both fields');
+      setChangePassLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/updatePassword`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setChangePassError(data.message || 'Failed to update password');
+      } else {
+        setChangePassSuccess('Password updated successfully');
+        setCurrentPassword('');
+        setNewPassword('');
+      }
+    } catch (error) {
+      setChangePassError('Something went wrong. Please try again.');
+    } finally {
+      setChangePassLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -65,6 +110,57 @@ function UserProfile() {
             <span className="text-red-600 font-semibold">Not Verified ❌</span>
           )}
         </p>
+      </div>
+
+      {/* Change Password Section */}
+      <div className="mt-12 max-w-md mx-auto">
+        <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+        <form onSubmit={handleChangePassword} className="space-y-4">
+          <div>
+            <label htmlFor="currentPassword" className="block font-medium mb-1">
+              Current Password
+            </label>
+            <input
+              type="password"
+              id="currentPassword"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              className="w-full px-3 py-2 border rounded"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="newPassword" className="block font-medium mb-1">
+              New Password
+            </label>
+            <input
+              type="password"
+              id="newPassword"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full px-3 py-2 border rounded"
+              required
+            />
+          </div>
+
+          {changePassError && (
+            <p className="text-red-600 font-medium">{changePassError}</p>
+          )}
+          {changePassSuccess && (
+            <p className="text-green-600 font-medium">{changePassSuccess}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={changePassLoading}
+            className={`w-full py-2 rounded text-white font-semibold ${
+              changePassLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            {changePassLoading ? 'Updating...' : 'Update Password'}
+          </button>
+        </form>
       </div>
 
       {/* Productivity Heatmap embedded here */}

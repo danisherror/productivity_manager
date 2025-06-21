@@ -179,3 +179,30 @@ exports.verifyEmail = async (req, res) => {
     res.status(400).json({ message: 'Invalid or expired token' });
   }
 };
+
+
+exports.updatePassword = BigPromise(async (req, res) => {
+  const userId = req.user._id; // Assuming you get user from token middleware
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: 'Current and new password are required' });
+  }
+
+  const user = await User.findById(userId).select('+password');
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  // Verify current password
+  const isMatch = await user.isValidatedPassword(currentPassword);
+  if (!isMatch) {
+    return res.status(401).json({ message: 'Current password is incorrect' });
+  }
+
+  // Update password (pre-save hook will hash it)
+  user.password = newPassword;
+  await user.save();
+
+  res.status(200).json({ success: true, message: 'Password updated successfully' });
+});
