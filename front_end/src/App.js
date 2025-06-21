@@ -13,6 +13,7 @@ import KanbanBoardListPage from './pages/KanbanBoardListPage';
 import KanbanBoardPage from './pages/KanbanBoardPage';
 import CreateBoard from './pages/CreateBoard'; 
 import CreateDailyProductivity from './pages/CreateDailyProductivity';
+import DailyProductivityAll from './pages/AllDailyProductivity';
 function App() {
   return (
     <Router>
@@ -31,6 +32,7 @@ function App() {
         <Route path="/kanban/create" element={<CreateBoard />} />
 
         <Route path="/daily-productivity/create" element={<CreateDailyProductivity />} />
+        <Route path="/daily-productivity" element={<DailyProductivityAll />} />
       </Routes>
     </Router>
   );
