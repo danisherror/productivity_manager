@@ -84,9 +84,6 @@ const Navbar = () => {
                 <Link to="/kanban" className={linkClasses('/kanban')}>
                   Kanban Board
                 </Link>
-                <Link to="/daily-productivity/create" className={linkClasses('/daily-productivity/create')}>
-                  daily productivity
-                </Link>
                 <Link to="/daily-productivity" className={linkClasses('/daily-productivity')}>
                   All daily productivity
                 </Link>
@@ -113,14 +110,27 @@ const Navbar = () => {
 
       {/* Floating Action Button */}
       {isLoggedIn && (
-        <button
-          onClick={() => navigate('/CreateScheduleTask')}
-          title="Create Task"
-          className="fixed bottom-5 right-5 w-14 h-14 rounded-full bg-blue-600 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
-        >
-          +
-        </button>
+        <>
+          {/* Create Schedule Task FAB */}
+          <button
+            onClick={() => navigate('/CreateScheduleTask')}
+            title="Create Schedule Task"
+            className="fixed bottom-5 right-5 w-14 h-14 rounded-full bg-blue-600 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
+          >
+            +
+          </button>
+
+          {/* Link to Daily Productivity FAB */}
+          <button
+            onClick={() => navigate('/daily-productivity/create')}
+            title="Daily Productivity Tasks"
+            className="fixed bottom-20 right-5 w-14 h-14 rounded-full bg-green-600 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 z-50"
+          >
+            📈
+          </button>
+        </>
       )}
+
     </>
   );
 };
