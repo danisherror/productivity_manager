@@ -5,6 +5,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showTasksDropdown, setShowTasksDropdown] = useState(false);
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -42,6 +43,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
     }
   };
 
+  const toggleTasksDropdown = () => setShowTasksDropdown(!showTasksDropdown);
+
   const linkClasses = (path) =>
     `block px-4 py-2 rounded-md my-1 transition-colors duration-200 ${
       location.pathname === path
@@ -65,18 +68,47 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0`}
       >
-        <div className="p-4 font-bold text-xl border-b border-gray-700">
-          My App
-        </div>
+        <div className="p-4 font-bold text-xl border-b border-gray-700">My App</div>
         <nav className="p-4 space-y-2">
           {isLoggedIn ? (
             <>
-              <Link to="/" className={linkClasses('/')}>Home</Link>
-              <Link to="/profile" className={linkClasses('/profile')}>Profile</Link>
-              <Link to="/AllScheduleTasks" className={linkClasses('/AllScheduleTasks')}>All Tasks</Link>
-              <Link to="/analysis" className={linkClasses('/analysis')}>Analysis</Link>
-              <Link to="/kanban" className={linkClasses('/kanban')}>Kanban Board</Link>
-              <Link to="/daily-productivity" className={linkClasses('/daily-productivity')}>All Daily Productivity</Link>
+              <Link to="/" className={linkClasses('/')}>
+                Home
+              </Link>
+              <Link to="/profile" className={linkClasses('/profile')}>
+                Profile
+              </Link>
+
+              {/* Dropdown header */}
+              <button
+                onClick={toggleTasksDropdown}
+                className="w-full flex justify-between items-center px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-left focus:outline-none"
+              >
+                <span>Tasks</span>
+                <span className={`transform transition-transform ${showTasksDropdown ? 'rotate-90' : ''}`}>
+                  ▶
+                </span>
+              </button>
+
+              {/* Dropdown content */}
+              {showTasksDropdown && (
+                <div className="pl-4">
+                  <Link to="/AllScheduleTasks" className={linkClasses('/AllScheduleTasks')}>
+                    All Scheduled Tasks
+                  </Link>
+                  <Link to="/daily-productivity" className={linkClasses('/daily-productivity')}>
+                    All Daily Productivity
+                  </Link>
+                </div>
+              )}
+
+              <Link to="/analysis" className={linkClasses('/analysis')}>
+                Analysis
+              </Link>
+              <Link to="/kanban" className={linkClasses('/kanban')}>
+                Kanban Board
+              </Link>
+
               <button
                 onClick={handleLogout}
                 className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200"
@@ -86,20 +118,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
             </>
           ) : (
             <>
-              <Link to="/signin" className={linkClasses('/signin')}>Sign In</Link>
-              <Link to="/signup" className={linkClasses('/signup')}>Sign Up</Link>
+              <Link to="/signin" className={linkClasses('/signin')}>
+                Sign In
+              </Link>
+              <Link to="/signup" className={linkClasses('/signup')}>
+                Sign Up
+              </Link>
             </>
           )}
         </nav>
       </aside>
 
       {/* Mobile backdrop */}
-      {isOpen && (
-        <div
-          onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black opacity-30 z-30 md:hidden"
-        />
-      )}
+      {isOpen && <div onClick={() => setIsOpen(false)} className="fixed inset-0 bg-black opacity-30 z-30 md:hidden" />}
 
       {/* Floating Action Buttons */}
       {isLoggedIn && (
