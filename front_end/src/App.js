@@ -14,6 +14,7 @@ import KanbanBoardPage from './pages/KanbanBoardPage';
 import CreateBoard from './pages/CreateBoard'; 
 import CreateDailyProductivity from './pages/CreateDailyProductivity';
 import DailyProductivityAll from './pages/AllDailyProductivity';
+import EditDailyProductivity from './pages/EditDailyProductivity';
 function App() {
   return (
     <Router>
@@ -33,6 +34,7 @@ function App() {
 
         <Route path="/daily-productivity/create" element={<CreateDailyProductivity />} />
         <Route path="/daily-productivity" element={<DailyProductivityAll />} />
+        <Route path="/daily-productivity/edit/:id" element={<EditDailyProductivity />} /> 
       </Routes>
     </Router>
   );

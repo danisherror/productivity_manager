@@ -204,7 +204,7 @@ export default function DailyProductivityAll() {
                                         <td className="py-2 px-4">{task.description}</td>
                                         <td className="py-2 px-4">{task.productivityScore}</td>
                                         <td className="py-2 px-4 space-x-2">
-                                            <Link to={`/EditTask/${task._id}`} className="text-blue-500 hover:underline">Edit</Link>
+                                            <Link to={`/daily-productivity/edit/${task._id}`} className="text-blue-500 hover:underline">Edit</Link>
                                             <button
                                                 onClick={() => deleteTask(task._id)}
                                                 className="text-red-500 hover:underline"
