@@ -186,12 +186,14 @@ const TaskAnalysis = () => {
                       {item.name}
                     </div>
 
-                    {/* Full filled color bar with % label inside */}
+                    {/* Full colored bar with centered % */}
                     <div
-                      className="relative w-36 h-6 rounded flex items-center justify-end pr-1"
+                      className="relative w-36 h-6 rounded-full overflow-hidden transition-all duration-700 ease-in-out growBar"
                       style={{ backgroundColor: barColor }}
                     >
-                      <span className="text-xs font-semibold text-white">{percentage}%</span>
+                      <span className="absolute w-full text-center text-white text-xs font-semibold leading-6 z-10">
+                        {percentage}%
+                      </span>
                     </div>
                   </div>
                 );
