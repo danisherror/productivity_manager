@@ -186,28 +186,29 @@ const TaskAnalysis = () => {
 
                   return (
                     <div key={i} className="flex items-center gap-4">
+                      {/* Task label */}
                       <div className="w-28 text-sm font-medium text-gray-700 truncate">
                         {item.name}
                       </div>
 
+                      {/* Bar container */}
                       <div className="relative flex-1 h-6 bg-gray-200 rounded-md overflow-hidden">
                         <div
-                          className="h-full rounded-md"
+                          className="h-full rounded-md flex justify-end items-center pr-2 text-white text-xs font-semibold"
                           style={{
                             width: `${percentage}%`,
                             backgroundColor: barColor,
                           }}
-                        ></div>
-                      </div>
-
-                      <div className="w-12 text-right text-sm font-semibold text-gray-800">
-                        {percentage}%
+                        >
+                          {percentage}%
+                        </div>
                       </div>
                     </div>
                   );
                 })}
             </div>
           </div>
+
 
 
 
