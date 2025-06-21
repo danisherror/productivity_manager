@@ -87,13 +87,13 @@ const Navbar = () => {
                 <Link to="/daily-productivity/create" className={linkClasses('/daily-productivity/create')}>
                   daily productivity
                 </Link>
+                <Link to="/daily-productivity" className={linkClasses('/daily-productivity')}>
+                  All daily productivity
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="block w-full px-4 py-2 my-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200"
                 >
-                  <Link to="/daily-productivity" className={linkClasses('/daily-productivity')}>
-                  All Tasks
-                </Link>
                   Logout
                 </button>
               </>

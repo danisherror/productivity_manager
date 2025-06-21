@@ -59,6 +59,10 @@ export default function DailyProductivityAll() {
             filtered.sort((a, b) => a.productivityScore - b.productivityScore);
         } else if (sortBy === 'scoreDesc') {
             filtered.sort((a, b) => b.productivityScore - a.productivityScore);
+        } else if (sortBy === 'dateAsc') {
+            filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+        } else if (sortBy === 'dateDesc') {
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
         }
 
         return filtered;
@@ -120,7 +124,7 @@ export default function DailyProductivityAll() {
                 </div>
 
                 <div>
-                    <label className="font-medium block mb-1">Search (task name, category, tags, description):</label>
+                    <label className="font-medium block mb-1">Search (description):</label>
                     <input
                         type="text"
                         placeholder="e.g. work, urgent, sleep"
@@ -142,6 +146,8 @@ export default function DailyProductivityAll() {
                             className="border px-3 py-2 rounded"
                         >
                             <option value="">None</option>
+                            <option value="dateAsc">Date ↑</option>
+                            <option value="dateDesc">Date ↓</option>
                             <option value="scoreAsc">Productivity Score ↑</option>
                             <option value="scoreDesc">Productivity Score ↓</option>
                         </select>
