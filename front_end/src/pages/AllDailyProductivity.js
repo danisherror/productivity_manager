@@ -20,9 +20,16 @@ export default function DailyProductivityAll() {
                 credentials: 'include'
             });
             const data = await res.json();
+
             if (res.ok) {
-                setTasks(data);
-                setFilteredTasks(data);
+                // Convert each task.date to YYYY-MM-DD format
+                const formattedData = data.map(task => ({
+                    ...task,
+                    date: new Date(task.date).toISOString().slice(0, 10),
+                }));
+
+                setTasks(formattedData);
+                setFilteredTasks(formattedData);
             } else {
                 setError('Failed to fetch daily productivity');
             }
@@ -32,6 +39,7 @@ export default function DailyProductivityAll() {
             setLoading(false);
         }
     };
+
 
     const applyFilters = (taskList, date, search) => {
         const terms = search
@@ -112,10 +120,11 @@ export default function DailyProductivityAll() {
             <h2 className="text-2xl font-bold mb-6 text-center">All daily productivity</h2>
             {error && <p className="text-red-500 mb-4">{error}</p>}
 
-            <div className="mb-6 space-y-4">
-                <div>
-                    <label className="font-medium">Filter by Date:&nbsp;</label>
+            <div className="mb-6 flex flex-wrap items-center gap-4">
+                <div className="flex flex-col">
+                    <label className="font-medium mb-1" htmlFor="dateFilter">Filter by Date:</label>
                     <input
+                        id="dateFilter"
                         type="date"
                         value={dateFilter}
                         onChange={e => setDateFilter(e.target.value)}
@@ -123,51 +132,49 @@ export default function DailyProductivityAll() {
                     />
                 </div>
 
-                <div>
-                    <label className="font-medium block mb-1">Search (description):</label>
+                <div className="flex flex-col flex-grow min-w-[200px]">
+                    <label className="font-medium mb-1" htmlFor="searchTerm">Search (description):</label>
                     <input
+                        id="searchTerm"
                         type="text"
-                        placeholder="e.g. work, urgent, sleep"
+                        placeholder="Enter description..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        className="w-full border px-3 py-2 rounded"
+                        className="w-full border rounded px-3 py-2"
                     />
-                    <small className="text-gray-500">
-                        Tip: Use commas to search multiple terms (e.g. "sleep, urgent")
-                    </small>
                 </div>
 
-                <div className="flex flex-wrap gap-4">
-                    <label>
-                        <span className="font-medium">Sort by:&nbsp;</span>
-                        <select
-                            value={sortBy}
-                            onChange={e => setSortBy(e.target.value)}
-                            className="border px-3 py-2 rounded"
-                        >
-                            <option value="">None</option>
-                            <option value="dateAsc">Date ↑</option>
-                            <option value="dateDesc">Date ↓</option>
-                            <option value="scoreAsc">Productivity Score ↑</option>
-                            <option value="scoreDesc">Productivity Score ↓</option>
-                        </select>
-                    </label>
+                <div className="flex flex-col">
+                    <label className="font-medium mb-1" htmlFor="sortBy">Sort by:</label>
+                    <select
+                        id="sortBy"
+                        value={sortBy}
+                        onChange={e => setSortBy(e.target.value)}
+                        className="border rounded px-3 py-2"
+                    >
+                        <option value="">None</option>
+                        <option value="dateAsc">Date ↑</option>
+                        <option value="dateDesc">Date ↓</option>
+                        <option value="scoreAsc">Productivity Score ↑</option>
+                        <option value="scoreDesc">Productivity Score ↓</option>
+                    </select>
+                </div>
 
-                    <label>
-                        <span className="font-medium">Tasks per page:&nbsp;</span>
-                        <select
-                            value={tasksPerPage}
-                            onChange={(e) => {
-                                setTasksPerPage(Number(e.target.value));
-                                setCurrentPage(1);
-                            }}
-                            className="border px-3 py-2 rounded"
-                        >
-                            {[5, 10, 25, 50, 100].map(num => (
-                                <option key={num} value={num}>{num}</option>
-                            ))}
-                        </select>
-                    </label>
+                <div className="flex flex-col">
+                    <label className="font-medium mb-1" htmlFor="tasksPerPage">Tasks per page:</label>
+                    <select
+                        id="tasksPerPage"
+                        value={tasksPerPage}
+                        onChange={e => {
+                            setTasksPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border rounded px-3 py-2"
+                    >
+                        {[5, 10, 25, 50, 100].map(num => (
+                            <option key={num} value={num}>{num}</option>
+                        ))}
+                    </select>
                 </div>
             </div>
 
