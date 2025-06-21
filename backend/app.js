@@ -18,12 +18,14 @@ const user=require('./Routes/users')
 const userSchedule = require('./Routes/UserSchedule')
 const kanbanBoard = require('./Routes/kanbanBoard');
 const kanbanComment = require('./Routes/kanbanComment');
-const kanbanTask = require('./Routes/kanbanTask')
-const kanbanColumn = require('./Routes/kanbanBoardColumns')
+const kanbanTask = require('./Routes/kanbanTask');
+const kanbanColumn = require('./Routes/kanbanBoardColumns');
+const dailyProductivity = require('./Routes/DailyProductivity')
 app.use("/api",user)
 app.use("/api",userSchedule)
 app.use("/api",kanbanBoard)
 app.use("/api",kanbanComment)
 app.use("/api",kanbanTask)
 app.use("/api",kanbanColumn)
+app.use("/api",dailyProductivity)
 module.exports=app;
