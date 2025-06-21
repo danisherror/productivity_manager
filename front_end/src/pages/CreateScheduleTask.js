@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
 export default function CreateScheduleTask() {
-  const [formData, setFormData] = useState({
+  const emptyTask = {
     taskName: '',
     description: '',
     category: '',
     startTime: '',
     endTime: '',
-  });
+  };
 
+  const [tasks, setTasks] = useState([emptyTask]);
   const [taskNameOptions, setTaskNameOptions] = useState([]);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [message, setMessage] = useState(null);
@@ -34,179 +35,201 @@ export default function CreateScheduleTask() {
     fetchTaskHelperData();
   }, []);
 
-  const handleChange = e => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+  const handleTaskChange = (index, e) => {
+    const { name, value } = e.target;
+    setTasks(prev =>
+      prev.map((task, i) =>
+        i === index ? { ...task, [name]: value } : task
+      )
+    );
+  };
+
+  const addTaskForm = () => {
+    setTasks([...tasks, emptyTask]);
+  };
+
+  const removeTaskForm = index => {
+    if (tasks.length === 1) return; // Prevent deleting the last form
+    setTasks(tasks.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setMessage(null);
     setError(null);
+    setMessage(null);
 
-    if (!formData.taskName || !formData.category || !formData.startTime || !formData.endTime) {
-      setError('Please fill in required fields: Task Name, Category, Start Time, End Time');
+    const invalid = tasks.some(task =>
+      !task.taskName || !task.category || !task.startTime || !task.endTime
+    );
+
+    if (invalid) {
+      setError('All tasks must include: Task Name, Category, Start Time, End Time');
       return;
     }
 
-    const { taskName, description, category, startTime, endTime } = formData;
-
-    const payload = {
-      taskName,
-      description,
-      category,
-      tags: category,
-      startTime,
-      endTime,
-      isCompleted: true,
-      productivityScore: 0,
-      mood: 'Neutral',
-      energyLevel: 5,
-    };
-
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_create`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      const responses = await Promise.all(
+        tasks.map(task =>
+          fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_create`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...task,
+              tags: task.category,
+              isCompleted: true,
+              productivityScore: 0,
+              mood: 'Neutral',
+              energyLevel: 5,
+            }),
+          })
+        )
+      );
 
-      const data = await response.json();
+      const failed = [];
+      for (let i = 0; i < responses.length; i++) {
+        if (!responses[i].ok) {
+          const errData = await responses[i].json();
+          failed.push(`Task ${i + 1}: ${errData.error || 'Unknown error'}`);
+        }
+      }
 
-      if (!response.ok) {
-        setError(data.error || 'Failed to create task');
+      if (failed.length > 0) {
+        setError(failed.join('\n'));
       } else {
-        alert('Registered successfully!');
-        setMessage('Task created successfully!');
-        setFormData({
-          taskName: '',
-          description: '',
-          category: '',
-          startTime: '',
-          endTime: '',
-        });
+        setMessage('All tasks created successfully!');
+        setTasks([emptyTask]);
       }
     } catch (err) {
-      setError('Server error. Please try again.');
       console.error(err);
+      setError('Server error. Please try again.');
     }
   };
 
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(null), 13000);
-      return () => clearTimeout(timer);
-    }
-  }, [message]);
-
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-semibold mb-4">Create Schedule Task</h2>
-      {error && <p className="text-red-600 mb-2">{error}</p>}
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-semibold mb-4">Create Multiple Schedule Tasks</h2>
+      {error && <p className="text-red-600 whitespace-pre-line mb-2">{error}</p>}
       {message && <p className="text-green-600 mb-2">{message}</p>}
 
       {loading ? (
         <div className="flex justify-center items-center py-10">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
-          <span className="ml-3 text-blue-600 text-lg">Loading tasks...</span>
+          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div>
+          <span className="ml-3 text-blue-600 text-lg">Loading...</span>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Task Name */}
-          <div>
-            <label className="block mb-1 font-medium">Task Name*</label>
-            <select
-              value={formData.taskName}
-              onChange={e => setFormData(prev => ({ ...prev, taskName: e.target.value }))}
-              className="w-full border border-gray-300 rounded px-3 py-2"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {tasks.map((task, index) => (
+            <div key={index} className="p-4 border rounded shadow-sm space-y-4 relative">
+              <button
+                type="button"
+                onClick={() => removeTaskForm(index)}
+                className="absolute top-2 right-2 text-red-500 hover:underline"
+                disabled={tasks.length === 1}
+              >
+                Remove
+              </button>
+
+              {/* Task Name */}
+              <div>
+                <label className="block font-medium">Task Name*</label>
+                <select
+                  value={task.taskName}
+                  onChange={e => handleTaskChange(index, e)}
+                  name="taskName"
+                  className="w-full border px-3 py-2 rounded mt-1"
+                >
+                  <option value="">-- Select or enter below --</option>
+                  {taskNameOptions.map((name, i) => (
+                    <option key={i} value={name}>{name}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  placeholder="Or enter new task name"
+                  value={task.taskName}
+                  name="taskName"
+                  onChange={e => handleTaskChange(index, e)}
+                  className="w-full border px-3 py-2 rounded mt-2"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block font-medium">Description</label>
+                <textarea
+                  name="description"
+                  value={task.description}
+                  onChange={e => handleTaskChange(index, e)}
+                  rows={2}
+                  className="w-full border px-3 py-2 rounded"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block font-medium">Category*</label>
+                <select
+                  value={task.category}
+                  onChange={e => handleTaskChange(index, e)}
+                  name="category"
+                  className="w-full border px-3 py-2 rounded mt-1"
+                >
+                  <option value="">-- Select or enter below --</option>
+                  {categoryOptions.map((cat, i) => (
+                    <option key={i} value={cat}>{cat}</option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  placeholder="Or enter new category"
+                  value={task.category}
+                  name="category"
+                  onChange={e => handleTaskChange(index, e)}
+                  className="w-full border px-3 py-2 rounded mt-2"
+                />
+              </div>
+
+              {/* Start Time */}
+              <div>
+                <label className="block font-medium">Start Time*</label>
+                <input
+                  type="datetime-local"
+                  name="startTime"
+                  value={task.startTime}
+                  onChange={e => handleTaskChange(index, e)}
+                  className="w-full border px-3 py-2 rounded"
+                />
+              </div>
+
+              {/* End Time */}
+              <div>
+                <label className="block font-medium">End Time*</label>
+                <input
+                  type="datetime-local"
+                  name="endTime"
+                  value={task.endTime}
+                  onChange={e => handleTaskChange(index, e)}
+                  className="w-full border px-3 py-2 rounded"
+                />
+              </div>
+            </div>
+          ))}
+
+          {/* Add Task Button */}
+          <div className="flex justify-between items-center">
+            <button
+              type="button"
+              onClick={addTaskForm}
+              className="text-blue-600 hover:underline"
             >
-              <option value="">-- Select a task or enter below --</option>
-              {taskNameOptions.map((name, idx) => (
-                <option key={idx} value={name}>{name}</option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Or enter new task name"
-              value={formData.taskName}
-              onChange={handleChange}
-              name="taskName"
-              className="w-full border border-gray-300 rounded px-3 py-2 mt-2"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block mb-1 font-medium">Description</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={3}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
-
-          {/* Category */}
-          <div>
-            <label className="block mb-1 font-medium">Category*</label>
-            <select
-              value={formData.category}
-              onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            >
-              <option value="">-- Select a category or enter below --</option>
-              {categoryOptions.map((cat, idx) => (
-                <option key={idx} value={cat}>{cat}</option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Or enter new category"
-              value={formData.category}
-              onChange={handleChange}
-              name="category"
-              className="w-full border border-gray-300 rounded px-3 py-2 mt-2"
-            />
-          </div>
-
-          {/* Start Time */}
-          <div>
-            <label className="block mb-1 font-medium">Start Time*</label>
-            <input
-              type="datetime-local"
-              name="startTime"
-              value={formData.startTime}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
-
-          {/* End Time */}
-          <div>
-            <label className="block mb-1 font-medium">End Time*</label>
-            <input
-              type="datetime-local"
-              name="endTime"
-              value={formData.endTime}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-          </div>
-
-          {/* Submit */}
-          <div>
+              + Add another task
+            </button>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
             >
-              Create Task
+              Submit All Tasks
             </button>
           </div>
         </form>
