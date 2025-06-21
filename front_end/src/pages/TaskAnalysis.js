@@ -139,6 +139,10 @@ const TaskAnalysis = () => {
 
       {!loading && !error && data.length > 0 && (
         <div className="grid md:grid-cols-2 gap-10 mt-8">
+          <div className="bg-white shadow rounded-lg p-6 flex flex-col items-center w-full md:col-span-2">
+            <h3 className="text-xl font-semibold mb-4 text-center">Animated Bars</h3>
+            <TaskAnalysisAnimatedBars data={data} />
+          </div>
           <div className="bg-white shadow rounded-lg p-6 overflow-x-auto flex flex-col items-center">
             <h3 className="text-xl font-semibold mb-4 text-center">Bar Chart</h3>
             <BarChart width={500} height={300} data={data}>
@@ -173,10 +177,6 @@ const TaskAnalysis = () => {
             </PieChart>
           </div>
 
-          <div className="bg-white shadow rounded-lg p-6 flex flex-col items-center w-full md:col-span-2">
-            <h3 className="text-xl font-semibold mb-4 text-center">Animated Bars</h3>
-            <TaskAnalysisAnimatedBars data={data} />
-          </div>
         </div>
 
       )}
