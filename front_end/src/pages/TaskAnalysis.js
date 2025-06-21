@@ -66,7 +66,10 @@ const TaskAnalysis = () => {
     const percentage = numberOfDays > 0 ? (totalScore / (numberOfDays * 10)) * 100 : 0;
 
     const totalMinutes = tasks
-      .filter(t => isWithinRange(t.startTime, startDate, endDate))
+      .filter(t =>
+        isWithinRange(t.startTime, startDate, endDate) ||
+        isWithinRange(t.endTime, startDate, endDate)
+      )
       .reduce((acc, t) => acc + getDuration(t.startTime, t.endTime), 0);
 
     setSummary({
