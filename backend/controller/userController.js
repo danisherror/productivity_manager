@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const UserRecord = require('../models/UserRecord');
 const jwt = require('jsonwebtoken');
 const BigPromise = require('../middlewares/bigPromise')
 const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -114,3 +115,28 @@ exports.userProfile = BigPromise(async (req, res) => {
     user
   })
 })
+
+exports.getUserRecord = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const userRecord = await UserRecord.findOne({ user: userId });
+
+    if (!userRecord || !userRecord.date || userRecord.date.length === 0) {
+      return res.status(404).json({ message: "No login records found" });
+    }
+
+    // Convert each date to YYYY-MM-DD format
+    const formattedDates = userRecord.date.map(d =>
+      new Date(d).toISOString().slice(0, 10)
+    );
+
+    res.status(200).json({
+      user: userId,
+      dates: formattedDates,
+    });
+  } catch (error) {
+    console.error('Error fetching user record:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

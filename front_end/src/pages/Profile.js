@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductivityHeatmap from './ProductivityHeatmap';
-
+import DailyLoginHeatmap from './DailyLoginHeatmap';
 function UserProfile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -63,6 +63,9 @@ function UserProfile() {
       {/* Productivity Heatmap embedded here */}
       <div className="mt-12">
         <ProductivityHeatmap />
+      </div>
+      <div className="mt-12">
+        <DailyLoginHeatmap />
       </div>
     </div>
   );
