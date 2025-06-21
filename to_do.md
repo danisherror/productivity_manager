@@ -12,7 +12,7 @@
     - creation date
     - last update
     - add / detete / update / get by date / get all.
-- [ ] Productivity heatmap
+- [x] Productivity heatmap
   - It will use the Daily productivity feature to show the heatmap with productivity.
 - [ ] EveryDay Heatmap
   - It is the set of dates
@@ -22,3 +22,5 @@
   - Add this in middleware, that will track, on which day you have login
     - and for other day, think of something.
 - [ ] create description on kanban board
+- [ ] sort the dates in the productivity heatmap.
+- [ ] make the start date as when the user has created the account in heatmap.

@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 export default function CreateBoard() {
   const [title, setTitle] = useState('');
-  const [columns, setColumns] = useState([{ title: '' }]); // at least one column by default
+  const [columns, setColumns] = useState([{ title: '' }]);
+  const [description, setDescription] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function CreateBoard() {
   };
 
   const removeColumn = (index) => {
-    if (columns.length === 1) return; // Must have at least one column
+    if (columns.length === 1) return;
     setColumns(columns.filter((_, i) => i !== index));
   };
 
@@ -37,31 +38,43 @@ export default function CreateBoard() {
       return;
     }
 
+    const duplicateTitles = columns
+      .map(c => c.title.trim())
+      .filter((t, i, arr) => t && arr.indexOf(t) !== i);
+    if (duplicateTitles.length > 0) {
+      setError(`Duplicate column title: "${duplicateTitles[0]}"`);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/kanban_board__create`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, columns }),
+        body: JSON.stringify({ title, description, columns }),
       });
 
       if (res.ok) {
         alert('Board created successfully!');
-        navigate('/kanban'); // Adjust route as needed
+        setTitle('');
+        setDescription('');
+        setColumns([{ title: '' }]);
+        navigate('/kanban');
       } else {
         const data = await res.json();
         setError(data.error || 'Failed to create board');
       }
     } catch (err) {
       setError('Server error');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
+    <div className="max-w-xl mx-auto p-6 bg-white rounded shadow mt-6">
       <h2 className="text-2xl font-semibold mb-6">Create Kanban Board</h2>
       {error && <div className="mb-4 text-red-600">{error}</div>}
 
@@ -79,22 +92,32 @@ export default function CreateBoard() {
         </div>
 
         <div>
-          <label className="block font-medium mb-2">Columns (at least one)</label>
+          <label className="block font-medium mb-1" htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            rows={2}
+            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block font-medium mb-2">Columns</label>
           {columns.map((col, idx) => (
-            <div key={idx} className="flex items-center mb-2 space-x-2">
+            <div key={idx} className="flex items-center gap-2 mb-3">
               <input
                 type="text"
                 value={col.title}
                 onChange={e => handleColumnChange(idx, e.target.value)}
                 placeholder={`Column #${idx + 1} title`}
-                className="flex-grow border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 border border-gray-300 rounded-md p-2"
               />
               <button
                 type="button"
                 onClick={() => removeColumn(idx)}
                 disabled={columns.length === 1}
-                className={`px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50`}
-                title="Remove column"
+                className="text-red-600 font-bold px-2 py-1 border border-red-600 rounded hover:bg-red-100 disabled:opacity-50"
               >
                 &times;
               </button>
@@ -112,9 +135,14 @@ export default function CreateBoard() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex justify-center items-center"
         >
-          {loading ? 'Creating...' : 'Create Board'}
+          {loading ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+              Creating...
+            </div>
+          ) : 'Create Board'}
         </button>
       </form>
     </div>

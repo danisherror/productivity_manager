@@ -122,8 +122,15 @@ export default function KanbanBoard({ board }) {
 
   return (
     <div className="p-4">
-      <div className="flex justify-between mb-4 items-center">
-        <h2 className="text-xl font-bold">{board.title}</h2>
+      <div className="flex justify-between mb-4 items-start">
+        <div className="flex flex-col max-w-md">
+          <h2 className="text-2xl font-bold">{board.title}</h2>
+          {board.description && (
+            <div className="mt-1 max-h-24 overflow-y-auto text-sm text-gray-600 p-2 bg-gray-100 rounded">
+              {board.description}
+            </div>
+          )}
+        </div>
         <div className="flex gap-2">
           <button
             onClick={() => {

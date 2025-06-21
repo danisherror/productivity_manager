@@ -6,6 +6,10 @@ const boardSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  description: {
+    type: String,
+    default: '',
+  },
   columns: {
     type: [
       {
