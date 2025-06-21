@@ -119,62 +119,70 @@ export default function AllTasks() {
             <h2 className="text-2xl font-bold mb-6 text-center">All Scheduled Tasks</h2>
             {error && <p className="text-red-500 mb-4">{error}</p>}
 
-            <div className="mb-6 space-y-4">
-                <div>
-                    <label className="font-medium">Filter by Date:&nbsp;</label>
+            <div className="mb-6 flex flex-wrap gap-6 md:gap-8 items-end">
+                {/* Date Filter */}
+                <div className="flex flex-col">
+                    <label className="font-medium mb-1" htmlFor="dateFilter">Filter by Date:</label>
                     <input
                         type="date"
+                        id="dateFilter"
                         value={dateFilter}
                         onChange={e => setDateFilter(e.target.value)}
-                        className="border rounded px-3 py-2"
+                        className="border border-gray-300 rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
 
-                <div>
-                    <label className="font-medium block mb-1">Search (task name, category, tags, description):</label>
+                {/* Search Input */}
+                <div className="flex flex-col flex-grow min-w-[240px]">
+                    <label className="font-medium mb-1" htmlFor="searchTerm">
+                        Search (task name, category, tags, description):
+                    </label>
                     <input
+                        id="searchTerm"
                         type="text"
                         placeholder="e.g. work, urgent, sleep"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
-                        className="w-full border px-3 py-2 rounded"
+                        className="w-full border border-gray-300 rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <small className="text-gray-500">
+                    {/* <small className="text-gray-500 mt-1">
                         Tip: Use commas to search multiple terms (e.g. "sleep, urgent")
-                    </small>
+                    </small> */}
                 </div>
 
-                <div className="flex flex-wrap gap-4">
-                    <label>
-                        <span className="font-medium">Sort by:&nbsp;</span>
-                        <select
-                            value={sortBy}
-                            onChange={e => setSortBy(e.target.value)}
-                            className="border px-3 py-2 rounded"
-                        >
-                            <option value="">None</option>
-                            <option value="startAsc">Start Time ↑</option>
-                            <option value="startDesc">Start Time ↓</option>
-                            <option value="endAsc">End Time ↑</option>
-                            <option value="endDesc">End Time ↓</option>
-                        </select>
-                    </label>
+                {/* Sort By Select */}
+                <div className="flex flex-col">
+                    <label className="font-medium mb-1" htmlFor="sortBy">Sort by:</label>
+                    <select
+                        id="sortBy"
+                        value={sortBy}
+                        onChange={e => setSortBy(e.target.value)}
+                        className="border border-gray-300 rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="">None</option>
+                        <option value="startAsc">Start Time ↑</option>
+                        <option value="startDesc">Start Time ↓</option>
+                        <option value="endAsc">End Time ↑</option>
+                        <option value="endDesc">End Time ↓</option>
+                    </select>
+                </div>
 
-                    <label>
-                        <span className="font-medium">Tasks per page:&nbsp;</span>
-                        <select
-                            value={tasksPerPage}
-                            onChange={(e) => {
-                                setTasksPerPage(Number(e.target.value));
-                                setCurrentPage(1);
-                            }}
-                            className="border px-3 py-2 rounded"
-                        >
-                            {[5, 10, 25, 50, 100].map(num => (
-                                <option key={num} value={num}>{num}</option>
-                            ))}
-                        </select>
-                    </label>
+                {/* Tasks Per Page */}
+                <div className="flex flex-col">
+                    <label className="font-medium mb-1" htmlFor="tasksPerPage">Tasks per page:</label>
+                    <select
+                        id="tasksPerPage"
+                        value={tasksPerPage}
+                        onChange={(e) => {
+                            setTasksPerPage(Number(e.target.value));
+                            setCurrentPage(1);
+                        }}
+                        className="border border-gray-300 rounded px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        {[5, 10, 25, 50, 100].map(num => (
+                            <option key={num} value={num}>{num}</option>
+                        ))}
+                    </select>
                 </div>
             </div>
 
