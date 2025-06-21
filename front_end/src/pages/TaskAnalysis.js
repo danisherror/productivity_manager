@@ -171,43 +171,34 @@ const TaskAnalysis = () => {
               <Tooltip />
             </PieChart>
           </div>
-          <div className="md:col-span-2 mt-8">
-            <h3 className="text-xl font-semibold mb-4 text-center">
-              ⏱️ Time Spent Breakdown by {paramLabels[selectedParam]}
-            </h3>
+          <div className="space-y-3">
+            {data
+              .sort((a, b) => b.minutes - a.minutes)
+              .map((item, i) => {
+                const total = data.reduce((sum, d) => sum + d.minutes, 0);
+                const percentage = ((item.minutes / total) * 100).toFixed(1);
+                const barColor = COLORS[i % COLORS.length];
 
-            <div className="space-y-3">
-              {data
-                .sort((a, b) => b.minutes - a.minutes)
-                .map((item, i) => {
-                  const total = data.reduce((sum, d) => sum + d.minutes, 0);
-                  const percentage = ((item.minutes / total) * 100).toFixed(1);
-                  const barColor = COLORS[i % COLORS.length];
-
-                  return (
-                    <div key={i} className="flex items-center gap-4">
-                      {/* Task label */}
-                      <div className="w-28 text-sm font-medium text-gray-700 truncate">
-                        {item.name}
-                      </div>
-
-                      {/* Bar container */}
-                      <div className="relative flex-1 h-6 bg-gray-200 rounded-md overflow-hidden">
-                        <div
-                          className="h-full rounded-md flex justify-end items-center pr-2 text-white text-xs font-semibold"
-                          style={{
-                            width: `${percentage}%`,
-                            backgroundColor: barColor,
-                          }}
-                        >
-                          {percentage}%
-                        </div>
-                      </div>
+                return (
+                  <div key={i} className="flex items-center gap-4">
+                    {/* Label */}
+                    <div className="w-28 text-sm font-medium text-gray-700 truncate">
+                      {item.name}
                     </div>
-                  );
-                })}
-            </div>
+
+                    {/* Full filled color bar with % label inside */}
+                    <div
+                      className="relative w-36 h-6 rounded flex items-center justify-end pr-1"
+                      style={{ backgroundColor: barColor }}
+                    >
+                      <span className="text-xs font-semibold text-white">{percentage}%</span>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
+
+
 
 
 
