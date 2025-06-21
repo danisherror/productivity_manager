@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-const Sidebar = () => {
+export default function Sidebar({ isOpen, setIsOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isOpen, setIsOpen] = useState(true); // Sidebar visible by default
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -20,27 +19,25 @@ const Sidebar = () => {
         setIsLoggedIn(false);
       }
     };
-
     checkLogin();
   }, [location]);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`, {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/logout`, {
         method: 'POST',
         credentials: 'include',
       });
 
-      if (response.ok) {
+      if (res.ok) {
         alert('Logout successful!');
         setIsLoggedIn(false);
         navigate('/signin');
       } else {
         alert('Logout failed. Please try again.');
-        console.error('Error:', await response.text());
       }
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      console.error(err);
       alert('An error occurred. Please try again.');
     }
   };
@@ -54,61 +51,49 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Toggle Button */}
+      {/* Toggle button on mobile */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        aria-label="Toggle sidebar"
+        className="fixed top-4 left-4 z-50 p-2 bg-gray-800 text-white rounded-md md:hidden"
       >
-        {isOpen ? '←' : '☰'}
+        ☰
       </button>
 
       {/* Sidebar */}
-      <nav
-        className={`fixed top-0 left-0 h-full bg-gray-100 border-r border-gray-300 p-4 transition-transform duration-300
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'} w-64 z-40 overflow-auto`}
+      <aside
+        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-40 transform transition-transform duration-300 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
       >
-        <h2 className="text-xl font-semibold mb-4">My App</h2>
-        {isLoggedIn ? (
-          <>
-            <Link to="/" className={linkClasses('/')}>
-              Home
-            </Link>
-            <Link to="/profile" className={linkClasses('/profile')}>
-              Profile
-            </Link>
-            <Link to="/AllScheduleTasks" className={linkClasses('/AllScheduleTasks')}>
-              All Tasks
-            </Link>
-            <Link to="/analysis" className={linkClasses('/analysis')}>
-              Analysis
-            </Link>
-            <Link to="/kanban" className={linkClasses('/kanban')}>
-              Kanban Board
-            </Link>
-            <Link to="/daily-productivity" className={linkClasses('/daily-productivity')}>
-              All daily productivity
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="block w-full px-4 py-2 my-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/signin" className={linkClasses('/signin')}>
-              Sign In
-            </Link>
-            <Link to="/signup" className={linkClasses('/signup')}>
-              Sign Up
-            </Link>
-          </>
-        )}
-      </nav>
+        <div className="p-4 font-bold text-xl border-b border-gray-700">
+          My App
+        </div>
+        <nav className="p-4 space-y-2">
+          {isLoggedIn ? (
+            <>
+              <Link to="/" className={linkClasses('/')}>Home</Link>
+              <Link to="/profile" className={linkClasses('/profile')}>Profile</Link>
+              <Link to="/AllScheduleTasks" className={linkClasses('/AllScheduleTasks')}>All Tasks</Link>
+              <Link to="/analysis" className={linkClasses('/analysis')}>Analysis</Link>
+              <Link to="/kanban" className={linkClasses('/kanban')}>Kanban Board</Link>
+              <Link to="/daily-productivity" className={linkClasses('/daily-productivity')}>All Daily Productivity</Link>
+              <button
+                onClick={handleLogout}
+                className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/signin" className={linkClasses('/signin')}>Sign In</Link>
+              <Link to="/signup" className={linkClasses('/signup')}>Sign Up</Link>
+            </>
+          )}
+        </nav>
+      </aside>
 
-      {/* Overlay for small screens */}
+      {/* Mobile backdrop */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
@@ -119,7 +104,6 @@ const Sidebar = () => {
       {/* Floating Action Buttons */}
       {isLoggedIn && (
         <>
-          {/* Create Schedule Task FAB */}
           <button
             onClick={() => navigate('/CreateScheduleTask')}
             title="Create Schedule Task"
@@ -128,7 +112,6 @@ const Sidebar = () => {
             +
           </button>
 
-          {/* Link to Daily Productivity FAB */}
           <button
             onClick={() => navigate('/daily-productivity/create')}
             title="Daily Productivity Tasks"
@@ -140,6 +123,4 @@ const Sidebar = () => {
       )}
     </>
   );
-};
-
-export default Sidebar;
+}
