@@ -4,6 +4,7 @@ import {
   PieChart, Pie, Cell,
 } from 'recharts';
 
+import TaskAnalysisAnimatedBars from './TaskAnalysisAnimatedBars';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28BF6', '#F67280'];
 
 const parameters = ['category', 'taskName'];
@@ -171,40 +172,7 @@ const TaskAnalysis = () => {
               <Tooltip />
             </PieChart>
           </div>
-          <div className="space-y-3">
-            {data
-              .sort((a, b) => b.minutes - a.minutes)
-              .map((item, i) => {
-                const total = data.reduce((sum, d) => sum + d.minutes, 0);
-                const percentage = ((item.minutes / total) * 100).toFixed(1);
-                const barColor = COLORS[i % COLORS.length];
-
-                return (
-                  <div key={i} className="flex items-center gap-4">
-                    {/* Label */}
-                    <div className="w-28 text-sm font-medium text-gray-700 truncate">
-                      {item.name}
-                    </div>
-
-                    {/* Full colored bar with centered % */}
-                    <div
-                      className="relative w-36 h-6 rounded-full overflow-hidden transition-all duration-700 ease-in-out growBar"
-                      style={{ backgroundColor: barColor }}
-                    >
-                      <span className="absolute w-full text-center text-white text-xs font-semibold leading-6 z-10">
-                        {percentage}%
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-
-
-
-
-
-
+          <TaskAnalysisAnimatedBars data={data} />
         </div>
       )}
     </div>
