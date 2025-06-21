@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../api'; // your axios instance or fetch wrapper
+import api from '../../api';
 import TaskModal from './TaskModal';
 
 export default function KanbanBoard({ board }) {
@@ -13,6 +13,10 @@ export default function KanbanBoard({ board }) {
 
   const [columns, setColumns] = useState(board.columns || []);
   const [newColumnName, setNewColumnName] = useState('');
+
+  const [isEditingBoard, setIsEditingBoard] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(board.title);
+  const [editedDescription, setEditedDescription] = useState(board.description || '');
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -115,50 +119,111 @@ export default function KanbanBoard({ board }) {
     }
   };
 
+  const updateBoard = async () => {
+    try {
+      const res = await api.put(`/kanban_board__update/${board._id}`, {
+        title: editedTitle.trim(),
+        description: editedDescription.trim(),
+      });
+      if (res.status === 200) {
+        setIsEditingBoard(false);
+        window.location.reload();
+      }
+    } catch (err) {
+      alert('Failed to update board');
+      console.error(err);
+    }
+  };
+
   const grouped = columns.map((col) => ({
     ...col,
     items: tasks.filter((t) => t.columnTitle === col.title).sort((a, b) => a.order - b.order),
   }));
 
   return (
-    <div className="p-4 max-w-full overflow-x-auto">
-      {/* Header */}
+    <div className="p-4 w-full overflow-x-auto">
       <div className="flex flex-col md:flex-row justify-between mb-4 gap-4">
-        <div className="flex flex-col max-w-md">
-          <h2 className="text-2xl font-bold">{board.title}</h2>
-          {board.description && (
-            <div className="mt-1 max-h-24 overflow-y-auto text-sm text-gray-600 p-2 bg-gray-100 rounded">
-              {board.description}
-            </div>
+        <div className="flex flex-col max-w-md w-full">
+          {isEditingBoard ? (
+            <>
+              <input
+                className="text-xl font-bold border rounded px-2 py-1 mb-2"
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+              />
+              <textarea
+                className="border rounded px-2 py-1 text-sm text-gray-600 bg-gray-50 h-24 resize-none overflow-y-auto"
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+              />
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold">{board.title}</h2>
+              {board.description && (
+                <div className="mt-1 max-h-24 overflow-y-auto text-sm text-gray-600 p-2 bg-gray-100 rounded">
+                  {board.description}
+                </div>
+              )}
+            </>
           )}
         </div>
-        <div className="flex flex-col md:flex-row gap-2">
-          <button
-            onClick={() => {
-              setModalTask(null);
-              setIsCreateMode(true);
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            + New Task
-          </button>
-          <button
-            onClick={deleteBoard}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            Delete Board
-          </button>
+
+        <div className="flex flex-wrap gap-2">
+          {isEditingBoard ? (
+            <>
+              <button
+                onClick={updateBoard}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => {
+                  setIsEditingBoard(false);
+                  setEditedTitle(board.title);
+                  setEditedDescription(board.description || '');
+                }}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setIsEditingBoard(true)}
+                className="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700"
+              >
+                Edit Board
+              </button>
+              <button
+                onClick={() => {
+                  setModalTask(null);
+                  setIsCreateMode(true);
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                + New Task
+              </button>
+              <button
+                onClick={deleteBoard}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+              >
+                Delete Board
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Add Column */}
-      <div className="mb-4 flex flex-col md:flex-row gap-2 items-start md:items-center">
+      <div className="mb-4 flex flex-wrap gap-2 items-center">
         <input
           type="text"
           placeholder="New column name"
           value={newColumnName}
           onChange={(e) => setNewColumnName(e.target.value)}
-          className="border border-gray-300 rounded px-2 py-1 w-full md:w-auto"
+          className="border border-gray-300 rounded px-2 py-1"
         />
         <button
           onClick={addNewColumn}
@@ -168,11 +233,10 @@ export default function KanbanBoard({ board }) {
         </button>
       </div>
 
-      {/* Task Columns */}
       {loading ? (
         <p>Loading tasks...</p>
       ) : (
-        <div className="flex md:grid md:grid-cols-3 gap-4 overflow-x-auto md:overflow-visible pb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {grouped.map((col) => (
             <div
               key={col._id}
@@ -204,7 +268,7 @@ export default function KanbanBoard({ board }) {
                 setDraggedTaskId(null);
                 setDraggedOverColumn(null);
               }}
-              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] w-[300px] flex-shrink-0 md:w-auto relative ${
+              className={`bg-gray-100 p-4 rounded shadow min-h-[300px] relative ${
                 draggedOverColumn === col.title ? 'bg-blue-100' : ''
               }`}
             >
