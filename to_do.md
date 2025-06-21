@@ -4,7 +4,7 @@
   - By using this chart user can see on which task they are spending their time in %,
   - It can be of a single date or for a range of date (start-end date). 
 - [x] Create kanban board (to-do, in-progress, completed).
-- [ ] Daily productivity
+- [x] Daily productivity
   - this will allow user to add the following thing by the use, here user can create a daily productivity for a single day, no duplicate for a single day.
     - Date (unique)
     - Description
