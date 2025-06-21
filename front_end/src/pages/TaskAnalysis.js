@@ -3,19 +3,17 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, Legend,
   PieChart, Pie, Cell,
 } from 'recharts';
-
 import TaskAnalysisAnimatedBars from './TaskAnalysisAnimatedBars';
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28BF6', '#F67280'];
 
 const parameters = ['category', 'taskName'];
-
-const paramLabels = {
-  category: 'Category',
-  taskName: 'Task Name',
-};
+const paramLabels = { category: 'Category', taskName: 'Task Name' };
 
 const TaskAnalysis = () => {
   const [tasks, setTasks] = useState([]);
+  const [productivity, setProductivity] = useState([]);
+  const [summary, setSummary] = useState({ totalScore: 0, numberOfDays: 0, percentage: 0 });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [startDate, setStartDate] = useState('');
@@ -24,14 +22,17 @@ const TaskAnalysis = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_getAll`, { credentials: 'include' })
-      .then(res => res.json())
-      .then(data => {
-        setTasks(data);
+    Promise.all([
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_getAll`, { credentials: 'include' }).then(res => res.json()),
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/user_daily_Productivity_getAll`, { credentials: 'include' }).then(res => res.json()),
+    ])
+      .then(([tasksData, prodData]) => {
+        setTasks(tasksData);
+        setProductivity(prodData);
         setLoading(false);
       })
       .catch(() => {
-        setError('Failed to fetch task data.');
+        setError('Failed to fetch task or productivity data.');
         setLoading(false);
       });
   }, []);
@@ -42,19 +43,17 @@ const TaskAnalysis = () => {
     const d = new Date(date);
     const fromDate = from ? new Date(from) : null;
     let toDate = to ? new Date(to) : null;
-
     if (fromDate && toDate && fromDate.toDateString() === toDate.toDateString()) {
       toDate.setHours(23, 59, 59, 999);
     }
-
     return (!fromDate || d >= fromDate) && (!toDate || d <= toDate);
   };
 
-  const filtered = tasks.filter(t => isWithinRange(t.startTime, startDate, endDate));
+  const filteredTasks = tasks.filter(t => isWithinRange(t.startTime, startDate, endDate));
 
   const generateSummary = (param) => {
     const summary = {};
-    filtered.forEach(t => {
+    filteredTasks.forEach(t => {
       const duration = getDuration(t.startTime, t.endTime);
       if (param === 'tags') {
         (t.tags || ['No Tag']).forEach(tag => {
@@ -62,11 +61,10 @@ const TaskAnalysis = () => {
           summary[trimmed] = (summary[trimmed] || 0) + duration;
         });
       } else {
-        let key;
+        let key = 'Unknown';
         switch (param) {
           case 'category': key = t.category || 'Uncategorized'; break;
           case 'taskName': key = t.taskName || 'No Name'; break;
-          default: key = 'Unknown';
         }
         summary[key] = (summary[key] || 0) + duration;
       }
@@ -75,6 +73,18 @@ const TaskAnalysis = () => {
   };
 
   const data = generateSummary(selectedParam);
+
+  useEffect(() => {
+    const filtered = productivity.filter(p => isWithinRange(p.date, startDate, endDate));
+    const totalScore = filtered.reduce((acc, rec) => acc + rec.productivityScore, 0);
+    const numberOfDays = filtered.length;
+    const percentage = numberOfDays > 0 ? (totalScore / (numberOfDays * 10)) * 100 : 0;
+    setSummary({
+      totalScore,
+      numberOfDays,
+      percentage: Number(percentage.toFixed(2)),
+    });
+  }, [productivity, startDate, endDate]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -121,7 +131,7 @@ const TaskAnalysis = () => {
       {loading && (
         <div className="flex justify-center items-center py-10">
           <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-solid"></div>
-          <span className="ml-3 text-blue-600 text-lg">Loading tasks...</span>
+          <span className="ml-3 text-blue-600 text-lg">Loading data...</span>
         </div>
       )}
 
@@ -129,56 +139,65 @@ const TaskAnalysis = () => {
         <div className="text-red-600 text-center my-4 font-medium">{error}</div>
       )}
 
-      {!loading && !error && filtered.length === 0 && (
-        <div className="text-center text-gray-500">No tasks found for selected date range.</div>
-      )}
+      {!loading && !error && (
+        <>
+          <div className="grid md:grid-cols-2 gap-10 mt-8">
+            <div className="bg-white shadow rounded-lg p-6 flex flex-col items-center w-full md:col-span-2">
+              <h3 className="text-xl font-semibold mb-4 text-center">Animated Bars</h3>
+              <TaskAnalysisAnimatedBars data={data} />
+            </div>
 
-      {!loading && !error && filtered.length > 0 && data.length === 0 && (
-        <div className="text-center text-gray-500">No data available for {paramLabels[selectedParam]}.</div>
-      )}
+            <div className="bg-white shadow rounded-lg p-6 overflow-x-auto flex flex-col items-center">
+              <h3 className="text-xl font-semibold mb-4 text-center">Bar Chart</h3>
+              <BarChart width={500} height={300} data={data}>
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-45} textAnchor="end" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="minutes" fill={COLORS[parameters.indexOf(selectedParam) % COLORS.length]} />
+              </BarChart>
+            </div>
 
-      {!loading && !error && data.length > 0 && (
-        <div className="grid md:grid-cols-2 gap-10 mt-8">
-          <div className="bg-white shadow rounded-lg p-6 flex flex-col items-center w-full md:col-span-2">
-            <h3 className="text-xl font-semibold mb-4 text-center">Animated Bars</h3>
-            <TaskAnalysisAnimatedBars data={data} />
+            <div className="bg-white shadow rounded-lg p-6 overflow-x-auto flex flex-col items-center">
+              <h3 className="text-xl font-semibold mb-4 text-center">Pie Chart</h3>
+              <PieChart width={400} height={300}>
+                <Pie data={data} dataKey="minutes" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                  {data.map((entry, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </div>
+
+            <div className="bg-white shadow rounded-lg p-6 flex flex-col items-center">
+              <h3 className="text-xl font-semibold mb-4 text-center">Productivity Score</h3>
+              <PieChart width={250} height={250}>
+                <Pie
+                  data={[
+                    { name: 'Productive', value: summary.percentage },
+                    { name: 'Remaining', value: 100 - summary.percentage }
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={3}
+                  dataKey="value"
+                >
+                  <Cell fill="#00C49F" />
+                  <Cell fill="#f3f4f6" />
+                </Pie>
+              </PieChart>
+              <div className="text-2xl font-bold text-green-600 mt-[-130px]">
+                {summary.percentage}%
+              </div>
+              <p className="mt-20 text-gray-600">
+                {summary.totalScore} points over {summary.numberOfDays} day(s)
+              </p>
+            </div>
           </div>
-          <div className="bg-white shadow rounded-lg p-6 overflow-x-auto flex flex-col items-center">
-            <h3 className="text-xl font-semibold mb-4 text-center">Bar Chart</h3>
-            <BarChart width={500} height={300} data={data}>
-              <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-45} textAnchor="end" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar
-                dataKey="minutes"
-                fill={COLORS[parameters.indexOf(selectedParam) % COLORS.length]}
-              />
-            </BarChart>
-          </div>
-
-          <div className="bg-white shadow rounded-lg p-6 overflow-x-auto flex flex-col items-center">
-            <h3 className="text-xl font-semibold mb-4 text-center">Pie Chart</h3>
-            <PieChart width={400} height={300}>
-              <Pie
-                data={data}
-                dataKey="minutes"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label
-              >
-                {data.map((entry, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </div>
-
-        </div>
-
+        </>
       )}
     </div>
   );

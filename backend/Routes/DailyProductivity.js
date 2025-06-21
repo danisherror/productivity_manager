@@ -7,4 +7,6 @@ router.get('/user_daily_Productivity_getByID/:id',isLoggedIn, daily_Productivity
 router.post('/user_daily_Productivity_create',isLoggedIn, daily_ProductivityController.create);
 router.put('/user_daily_Productivity_update/:id',isLoggedIn, daily_ProductivityController.update);
 router.delete('/user_daily_Productivity_delete/:id',isLoggedIn, daily_ProductivityController.delete);
+router.get('/user_daily_Productivity_getSummary',isLoggedIn, daily_ProductivityController.getSummary);
+
 module.exports=router;

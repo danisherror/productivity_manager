@@ -83,3 +83,24 @@ exports.delete = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+
+exports.getSummary = async (req, res) =>  {
+  try {
+    const userId = req.user._id; // assuming you're using auth middleware
+
+    const records = await DailyProductivity.find({ user: userId });
+
+    const totalScore = records.reduce((sum, record) => sum + record.productivityScore, 0);
+    const numberOfDays = records.length;
+    const percentage = numberOfDays > 0 ? (totalScore / (numberOfDays * 10)) * 100 : 0;
+
+    res.json({
+      totalScore,
+      numberOfDays,
+      percentage: Number(percentage.toFixed(2)),
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+};
