@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios from '../api'; // adjust based on your setup
+import axios from '../../api'; // adjust based on your setup
 
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams();

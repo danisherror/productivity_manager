@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Sidebar from './pages/Sidebar'; // your updated Sidebar
-import Home from './pages/Home';
+import Sidebar from './pages/Helper/Sidebar'; // your updated Sidebar
+import Home from './pages/Helper/Home';
 import Signup from './pages/Login/Signup';
 import Profile from './pages/User_Profile/Profile';
 import Signin from './pages/Login/Signin';
 import CreateScheduleTask from './pages/ScheduleTask/CreateScheduleTask';
 import AllScheduleTasks from './pages/ScheduleTask/AllScheduleTasks';
 import EditTask from './pages/ScheduleTask/EditTask';
-import TaskAnalysis from './pages/TaskAnalysis';
+import TaskAnalysis from './pages/Analysis/TaskAnalysis';
 import KanbanBoardListPage from './pages/KanbanBoard/KanbanBoardListPage';
 import KanbanBoardPage from './pages/KanbanBoard/KanbanBoardPage';
 import CreateBoard from './pages/KanbanBoard/CreateBoard';
 import CreateDailyProductivity from './pages/DailyProductivity/CreateDailyProductivity';
 import DailyProductivityAll from './pages/DailyProductivity/AllDailyProductivity';
 import EditDailyProductivity from './pages/DailyProductivity/EditDailyProductivity';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
+import VerifyEmailPage from './pages/Password_mail/VerifyEmailPage';
+import ForgotPasswordPage from './pages/Password_mail/ForgotPasswordPage';
+import ResetPasswordPage from './pages/Password_mail/ResetPasswordPage';
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
