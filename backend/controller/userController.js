@@ -22,9 +22,8 @@ exports.signup = async (req, res) => {
     if (!username || !name || !email || !password) {
       return res.status(400).json({ message: 'Please provide all required fields.' });
     }
-    if(!isStrongPassword(password))
-    {
-      return res.status(400).json({ message: 'Please provide all required fields.' });
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({ message: 'Password is not strong enough. It must be 8-20 characters long and include uppercase, lowercase, number, and special character.' });
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'Email already registered.' });
@@ -35,26 +34,18 @@ exports.signup = async (req, res) => {
     const user = await User.create({ username, name, email, password });
 
     // Generate token for email verification
-    const verificationToken = jwt.sign({ id: user._id }, process.env.EMAIL_SECRET, { expiresIn: '1d' });
+    try {
+      const verificationToken = jwt.sign({ id: user._id }, process.env.EMAIL_SECRET, { expiresIn: '1d' });
+      const verificationURL = `${process.env.front_end_url}/verify-email?token=${verificationToken}`;
 
-    const verificationURL = `${process.env.front_end_url}/verify-email?token=${verificationToken}`;
-    try{
-    // Send email
-    await sendEmail({
-      to: user.email,
-      subject: 'Verify Your Email',
-      text: `Hi ${user.name}, please verify your email by clicking this link: ${verificationURL}`,
-    });
+      await sendEmail({ to: user.email, subject: 'Verify Your Email', text: `Hi ${user.name}, please verify your email by clicking this link: ${verificationURL}` });
 
-    res.status(201).json({
-      success: true,
-      message: 'Signup successful. Please verify your email.',
-    });
-  }
-  catch (error) {
-    console.error('Signup 11error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
+      res.status(201).json({ success: true, message: 'Signup successful. Please verify your email.' });
+
+    } catch (err) {
+      await User.findByIdAndDelete(user._id); // rollback
+      return res.status(500).json({ message: 'Signup failed. Could not send verification email.' });
+    }
   } catch (error) {
     console.error('Signup error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -284,11 +275,10 @@ exports.resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
     // console.log(req.body) 
-    if(!isStrongPassword(password))
-    {
+    if (!password || password.trim() === '') {
       return res.status(400).json({ message: 'New password is required.' });
     }
-    if (!password || password.trim() === '') {
+    if (!isStrongPassword(password)) {
       return res.status(400).json({ message: 'New password is required.' });
     }
 

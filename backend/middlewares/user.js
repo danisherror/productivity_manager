@@ -15,28 +15,42 @@ exports.isLoggedIn = async (req, res, next) => {
     if (!req.user) {
       return res.status(404).json({ message: "User not found" });
     }
-
     const today = new Date();
 
     // Find or create the UserRecord
     let userRecord = await UserRecord.findOne({ user: req.user._id });
+    try {
+      const todayDateOnly = today.toISOString().slice(0, 10); // 'YYYY-MM-DD'
 
-    if (!userRecord) {
-      // Create new document with today's date
-      userRecord = new UserRecord({
-        user: req.user._id,
-        date: [today],
-      });
-    } else {
-      // Check if today's date already exists in the array
-      const alreadyExists = userRecord.date.some(d => d.toISOString().slice(0, 10) === today.toISOString().slice(0, 10));
+      if (!userRecord) {
+        // Create new document with today's date
+        userRecord = new UserRecord({
+          user: req.user._id,
+          date: [today],
+        });
+      } else {
+        // Normalize existing dates for comparison
+        const existingDates = userRecord.date.map(d => d.toISOString().slice(0, 10));
 
-      if (!alreadyExists) {
-        userRecord.date.push(today);
+        // Add today if not already in list
+        if (!existingDates.includes(todayDateOnly)) {
+          userRecord.date.push(today);
+        }
+
+        // Ensure final date array is unique
+        userRecord.date = Array.from(
+          new Map(
+            userRecord.date.map(d => [d.toISOString().slice(0, 10), d])
+          ).values()
+        );
       }
-    }
 
-    await userRecord.save();
+      await userRecord.save();
+    }
+    catch (error) {
+      console.error("User record error:", error);
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
 
     next();
   } catch (error) {
