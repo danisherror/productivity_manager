@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import api from '../api';
-import KanbanBoard from './components/KanbanBoard';
+import api from '../../api';
+import KanbanBoard from './KanbanBoard';
 
 export default function KanbanBoardPage() {
   const { id } = useParams();

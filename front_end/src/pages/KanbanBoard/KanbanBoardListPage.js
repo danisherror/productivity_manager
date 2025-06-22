@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import KanbanBoardList from './components/KanbanBoardList';
+import KanbanBoardList from './KanbanBoardList';
 import { useNavigate } from 'react-router-dom';
 
 export default function KanbanBoardListPage() {
