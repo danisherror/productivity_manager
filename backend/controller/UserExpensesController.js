@@ -9,7 +9,7 @@ exports.create = async (req, res) => {
       category,
       price
     } = req.body;
-    const userId=req.user._id
+    const userId = req.user._id
 
     const newExpenses = new UserExpenses({
       user: userId,
@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const expenses = await UserExpenses.find({ user: req.user._id }).sort({ startTime: 1 });
+    const expenses = await UserExpenses.find({ user: req.user._id }).sort({ date: -1 }); // or createdAt
     res.status(200).json(expenses);
   } catch (err) {
     console.error('Error fetching expenses:', err);

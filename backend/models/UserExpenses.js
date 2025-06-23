@@ -19,7 +19,7 @@ const userExpensesSchema = new mongoose.Schema({
     required: true // e.g., Work, Study, Exercise, Break, Sleep
   },
   price: {
-    type: Number, // store in minutes or seconds
+    type: Number, // store in rupees/dollars (not time - if it's time, rename field)
     required: true
   },
   date: {
