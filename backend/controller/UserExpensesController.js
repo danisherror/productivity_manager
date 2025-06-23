@@ -7,16 +7,18 @@ exports.create = async (req, res) => {
       expensesName,
       description,
       category,
-      price
+      price,
+      date
     } = req.body;
     const userId = req.user._id
-
+    
     const newExpenses = new UserExpenses({
       user: userId,
       expensesName,
       description,
       category,
-      price
+      price,
+      date
     });
 
     const savedExpenses = await newExpenses.save();
@@ -55,7 +57,6 @@ exports.getById = async (req, res) => {
 exports.getUserExpensesHelper = async (req, res) => {
   try {
     const allExpenses = await UserExpenses.find({ user: req.user._id }).sort({ date: -1 });
-
     const expensesNameSet = new Set();
     const categorySet = new Set();
     for (let i = 0; i < allExpenses.length; i++) {
@@ -79,7 +80,8 @@ exports.update = async (req, res) => {
       expensesName,
       description,
       category,
-      price
+      price,
+      date
     } = req.body;
 
     const expense = await UserExpenses.findOne({ _id: req.params.id, user: req.user._id });
@@ -90,7 +92,7 @@ exports.update = async (req, res) => {
     if (description !== undefined) expense.description = description;
     if (category !== undefined) expense.category = category;
     if (price !== undefined) expense.price = price;
-
+    if (date !== undefined) expense.date = new Date(date);
 
     const updated = await expense.save();
     res.status(200).json(updated);

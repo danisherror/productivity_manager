@@ -8,6 +8,7 @@ export default function CreateExpenses() {
     category: '',
     customCategory: '',
     price: '',
+    date: '', // New field added
   };
 
   const [expenses, setExpenses] = useState([emptyExpense]);
@@ -64,14 +65,15 @@ export default function CreateExpenses() {
       category: exp.category === '__custom__' ? exp.customCategory : exp.category,
       description: exp.description,
       price: Number(exp.price),
+      date: exp.date || new Date().toISOString().slice(0, 10), // Default to today if not provided
     }));
 
     const invalid = preparedExpenses.some(exp =>
-      !exp.expensesName || !exp.category || isNaN(exp.price) || exp.price <= 0
+      !exp.expensesName || !exp.category || isNaN(exp.price) || exp.price <= 0 || !exp.date
     );
 
     if (invalid) {
-      setError('Each expense must include: Name, Category, and valid Price.');
+      setError('Each expense must include: Name, Category, valid Price, and Date.');
       return;
     }
 
@@ -208,6 +210,18 @@ export default function CreateExpenses() {
                   className="w-full border px-3 py-2 rounded"
                   min="0"
                   step="0.01"
+                />
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="block font-medium">Date*</label>
+                <input
+                  type="date"
+                  name="date"
+                  value={exp.date}
+                  onChange={e => handleChange(index, e)}
+                  className="w-full border px-3 py-2 rounded"
                 />
               </div>
             </div>
