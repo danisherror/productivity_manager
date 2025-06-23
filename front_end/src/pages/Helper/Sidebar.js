@@ -6,6 +6,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showTasksDropdown, setShowTasksDropdown] = useState(false);
+  const [showAnalysisDropdown, setShowAnalysisDropdown] = useState(false);
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -44,11 +45,13 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   };
 
   const toggleTasksDropdown = () => setShowTasksDropdown(!showTasksDropdown);
+  const toggleAnalysisDropdown = () => setShowAnalysisDropdown(!showAnalysisDropdown);
 
   const linkClasses = (path) =>
-    `block px-4 py-2 rounded-md my-1 transition-colors duration-200 ${location.pathname === path
-      ? 'bg-blue-600 text-white'
-      : 'bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white'
+    `block px-4 py-2 rounded-md my-1 transition-colors duration-200 ${
+      location.pathname === path
+        ? 'bg-blue-600 text-white'
+        : 'bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white'
     }`;
 
   return (
@@ -63,8 +66,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-40 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'
-          } md:translate-x-0`}
+        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-40 transform transition-transform duration-300 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0`}
       >
         <div className="p-4 font-bold text-xl border-b border-gray-700">My App</div>
         <nav className="p-4 space-y-2">
@@ -77,7 +81,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 Profile
               </Link>
 
-              {/* Dropdown header */}
+              {/* Tasks Dropdown */}
               <button
                 onClick={toggleTasksDropdown}
                 className="w-full flex justify-between items-center px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-left focus:outline-none"
@@ -88,7 +92,6 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 </span>
               </button>
 
-              {/* Dropdown content */}
               {showTasksDropdown && (
                 <div className="pl-4">
                   <Link to="/AllScheduleTasks" className={linkClasses('/AllScheduleTasks')}>
@@ -103,9 +106,28 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                 </div>
               )}
 
-              <Link to="/analysis" className={linkClasses('/analysis')}>
-                Analysis
-              </Link>
+              {/* Analysis Dropdown */}
+              <button
+                onClick={toggleAnalysisDropdown}
+                className="w-full flex justify-between items-center px-4 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-left focus:outline-none"
+              >
+                <span>Analysis</span>
+                <span className={`transform transition-transform ${showAnalysisDropdown ? 'rotate-90' : ''}`}>
+                  ▶
+                </span>
+              </button>
+
+              {showAnalysisDropdown && (
+                <div className="pl-4">
+                  <Link to="/analysis" className={linkClasses('/analysis')}>
+                    Task Analysis
+                  </Link>
+                  <Link to="/expenseanalysis" className={linkClasses('/expenseanalysis')}>
+                    Expense Analysis
+                  </Link>
+                </div>
+              )}
+
               <Link to="/kanban" className={linkClasses('/kanban')}>
                 Kanban Board
               </Link>
