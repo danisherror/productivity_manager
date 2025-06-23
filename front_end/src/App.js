@@ -18,6 +18,8 @@ import EditDailyProductivity from './pages/DailyProductivity/EditDailyProductivi
 import VerifyEmailPage from './pages/Password_mail/VerifyEmailPage';
 import ForgotPasswordPage from './pages/Password_mail/ForgotPasswordPage';
 import ResetPasswordPage from './pages/Password_mail/ResetPasswordPage';
+// =====
+import CreateUserExpenses from './pages/Expenses/CreateUserExpenses';
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -46,6 +48,7 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/CreateUserExpenses" element={<CreateUserExpenses />} />
         </Routes>
       </div>
     </Router>

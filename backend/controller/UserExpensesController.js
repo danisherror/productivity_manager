@@ -52,6 +52,27 @@ exports.getById = async (req, res) => {
   }
 };
 
+exports.getUserExpensesHelper = async (req, res) => {
+  try {
+    const allExpenses = await UserExpenses.find({ user: req.user._id }).sort({ date: -1 });
+
+    const expensesNameSet = new Set();
+    const categorySet = new Set();
+    for (let i = 0; i < allExpenses.length; i++) {
+      if (allExpenses[i].expensesName) expensesNameSet.add(allExpenses[i].expensesName);
+      if (allExpenses[i].category) categorySet.add(allExpenses[i].category);
+    }
+
+    const expensesNames = Array.from(expensesNameSet);
+    const categories = Array.from(categorySet);
+
+    res.status(200).json({ expensesNames, categories });
+  } catch (err) {
+    console.error('Error fetching tasks:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 exports.update = async (req, res) => {
   try {
     const {
