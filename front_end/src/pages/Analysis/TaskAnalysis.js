@@ -32,15 +32,40 @@ const TaskAnalysis = () => {
 
   const isWithinRange = (date, from, to) => {
     const d = new Date(date);
-    const fromDate = from ? new Date(from) : null;
-    let toDate = to ? new Date(to) : null;
 
-    if (fromDate && toDate && fromDate.toDateString() === toDate.toDateString()) {
-      toDate.setHours(23, 59, 59, 999);
+    const dUTC = new Date(Date.UTC(
+      d.getUTCFullYear(),
+      d.getUTCMonth(),
+      d.getUTCDate(),
+      d.getUTCHours(),
+      d.getUTCMinutes(),
+      d.getUTCSeconds(),
+      d.getUTCMilliseconds()
+    ));
+
+    const fromDate = from ? new Date(from) : null;
+    const toDate = to ? new Date(to) : null;
+
+    let fromUTC = fromDate ? new Date(Date.UTC(
+      fromDate.getUTCFullYear(),
+      fromDate.getUTCMonth(),
+      fromDate.getUTCDate()
+    )) : null;
+
+    let toUTC = toDate ? new Date(Date.UTC(
+      toDate.getUTCFullYear(),
+      toDate.getUTCMonth(),
+      toDate.getUTCDate()
+    )) : null;
+
+    // If same date, set toUTC to end of the day
+    if (fromUTC && toUTC && fromUTC.getTime() === toUTC.getTime()) {
+      toUTC.setUTCHours(23, 59, 59, 999);
     }
 
-    return (!fromDate || d >= fromDate) && (!toDate || d <= toDate);
+    return (!fromUTC || dUTC >= fromUTC) && (!toUTC || dUTC <= toUTC);
   };
+
 
   useEffect(() => {
     setLoading(true);
