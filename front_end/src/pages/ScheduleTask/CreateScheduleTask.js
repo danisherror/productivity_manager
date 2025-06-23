@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 export default function CreateScheduleTask() {
   const emptyTask = {
     taskName: '',
+    customTaskName: '',
     description: '',
     category: '',
+    customCategory: '',
     startTime: '',
     endTime: '',
   };
@@ -49,7 +51,7 @@ export default function CreateScheduleTask() {
   };
 
   const removeTaskForm = index => {
-    if (tasks.length === 1) return; // Prevent deleting the last form
+    if (tasks.length === 1) return;
     setTasks(tasks.filter((_, i) => i !== index));
   };
 
@@ -58,7 +60,13 @@ export default function CreateScheduleTask() {
     setError(null);
     setMessage(null);
 
-    const invalid = tasks.some(task =>
+    const preparedTasks = tasks.map(task => ({
+      ...task,
+      taskName: task.taskName === '__custom__' ? task.customTaskName : task.taskName,
+      category: task.category === '__custom__' ? task.customCategory : task.category,
+    }));
+
+    const invalid = preparedTasks.some(task =>
       !task.taskName || !task.category || !task.startTime || !task.endTime
     );
 
@@ -69,7 +77,7 @@ export default function CreateScheduleTask() {
 
     try {
       const responses = await Promise.all(
-        tasks.map(task =>
+        preparedTasks.map(task =>
           fetch(`${process.env.REACT_APP_BACKEND_URL}/user_schedule_create`, {
             method: 'POST',
             credentials: 'include',
@@ -120,7 +128,7 @@ export default function CreateScheduleTask() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {tasks.map((task, index) => (
-            <div key={index} className="p-4 border rounded shadow-sm space-y-4 relative">
+            <div key={`task-${index}`} className="p-4 border rounded shadow-sm space-y-4 relative">
               <button
                 type="button"
                 onClick={() => removeTaskForm(index)}
@@ -139,19 +147,22 @@ export default function CreateScheduleTask() {
                   name="taskName"
                   className="w-full border px-3 py-2 rounded mt-1"
                 >
-                  <option value="">-- Select or enter below --</option>
-                  {taskNameOptions.map((name, i) => (
-                    <option key={i} value={name}>{name}</option>
+                  <option value="">-- Select task name --</option>
+                  {taskNameOptions.map(name => (
+                    <option key={name} value={name}>{name}</option>
                   ))}
+                  <option value="__custom__">Other</option>
                 </select>
-                <input
-                  type="text"
-                  placeholder="Or enter new task name"
-                  value={task.taskName}
-                  name="taskName"
-                  onChange={e => handleTaskChange(index, e)}
-                  className="w-full border px-3 py-2 rounded mt-2"
-                />
+                {task.taskName === '__custom__' && (
+                  <input
+                    type="text"
+                    placeholder="Enter custom task name"
+                    name="customTaskName"
+                    value={task.customTaskName}
+                    onChange={e => handleTaskChange(index, e)}
+                    className="w-full border px-3 py-2 rounded mt-2"
+                  />
+                )}
               </div>
 
               {/* Description */}
@@ -175,19 +186,22 @@ export default function CreateScheduleTask() {
                   name="category"
                   className="w-full border px-3 py-2 rounded mt-1"
                 >
-                  <option value="">-- Select or enter below --</option>
-                  {categoryOptions.map((cat, i) => (
-                    <option key={i} value={cat}>{cat}</option>
+                  <option value="">-- Select category --</option>
+                  {categoryOptions.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
                   ))}
+                  <option value="__custom__">Other</option>
                 </select>
-                <input
-                  type="text"
-                  placeholder="Or enter new category"
-                  value={task.category}
-                  name="category"
-                  onChange={e => handleTaskChange(index, e)}
-                  className="w-full border px-3 py-2 rounded mt-2"
-                />
+                {task.category === '__custom__' && (
+                  <input
+                    type="text"
+                    placeholder="Enter custom category"
+                    name="customCategory"
+                    value={task.customCategory}
+                    onChange={e => handleTaskChange(index, e)}
+                    className="w-full border px-3 py-2 rounded mt-2"
+                  />
+                )}
               </div>
 
               {/* Start Time */}
@@ -216,7 +230,7 @@ export default function CreateScheduleTask() {
             </div>
           ))}
 
-          {/* Add Task Button */}
+          {/* Add & Submit Buttons */}
           <div className="flex justify-between items-center">
             <button
               type="button"
