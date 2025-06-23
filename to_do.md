@@ -27,3 +27,4 @@
 - [x] Email varification and re-send
 - [x] Change the password
 - [x] forget password through mail
+- [ ] Issue 5 Need to add same thing for expense so that i can see where i am spending my money 

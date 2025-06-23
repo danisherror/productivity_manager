@@ -1,0 +1,93 @@
+const UserExpenses = require('../models/UserExpenses');
+
+
+exports.create = async (req, res) => {
+  try {
+    const {
+      expensesName,
+      description,
+      category,
+      price
+    } = req.body;
+    const userId=req.user._id
+
+    const newExpenses = new UserExpenses({
+      user: userId,
+      expensesName,
+      description,
+      category,
+      price
+    });
+
+    const savedExpenses = await newExpenses.save();
+
+    return res.status(201).json(savedExpenses);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+exports.getAll = async (req, res) => {
+  try {
+    const expenses = await UserExpenses.find({ user: req.user._id }).sort({ startTime: 1 });
+    res.status(200).json(expenses);
+  } catch (err) {
+    console.error('Error fetching expenses:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+exports.getById = async (req, res) => {
+  try {
+    const expenses = await UserExpenses.findOne({ _id: req.params.id, user: req.user._id });
+    if (!expenses) return res.status(404).json({ error: 'expenses not found' });
+
+    res.status(200).json(expenses);
+  } catch (err) {
+    console.error('Error fetching expenses:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.update = async (req, res) => {
+  try {
+    const {
+      expensesName,
+      description,
+      category,
+      price
+    } = req.body;
+
+    const expense = await UserExpenses.findOne({ _id: req.params.id, user: req.user._id });
+    if (!expense) return res.status(404).json({ error: 'expense not found' });
+
+    // Update fields
+    if (expensesName !== undefined) expense.expensesName = expensesName;
+    if (description !== undefined) expense.description = description;
+    if (category !== undefined) expense.category = category;
+    if (price !== undefined) expense.price = price;
+
+
+    const updated = await expense.save();
+    res.status(200).json(updated);
+  } catch (err) {
+    console.error('Error updating expense:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+exports.delete = async (req, res) => {
+  try {
+    const expense = await UserExpenses.findOneAndDelete({ _id: req.params.id, user: req.user._id });
+    if (!expense) return res.status(404).json({ error: 'expense not found' });
+
+    res.status(200).json({ message: 'expense deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting expense:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
