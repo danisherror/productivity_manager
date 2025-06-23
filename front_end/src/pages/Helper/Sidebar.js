@@ -99,6 +99,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   <Link to="/daily-productivity" className={linkClasses('/daily-productivity')}>
                     All Daily Productivity
                   </Link>
+                  <Link to="/AllExpenses" className={linkClasses('/AllExpenses')}>
+                    All Expenses
+                  </Link>
                 </div>
               )}
 

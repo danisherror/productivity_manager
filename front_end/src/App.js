@@ -20,6 +20,8 @@ import ForgotPasswordPage from './pages/Password_mail/ForgotPasswordPage';
 import ResetPasswordPage from './pages/Password_mail/ResetPasswordPage';
 // =====
 import CreateUserExpenses from './pages/Expenses/CreateUserExpenses';
+import AllExpenses from './pages/Expenses/AllUserExpenses';
+import EditExpense from './pages/Expenses/EditExpenses';
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -49,6 +51,8 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/CreateUserExpenses" element={<CreateUserExpenses />} />
+          <Route path="/AllExpenses" element={<AllExpenses />} />
+          <Route path="/editExpense/:id" element={<EditExpense />} />
         </Routes>
       </div>
     </Router>
