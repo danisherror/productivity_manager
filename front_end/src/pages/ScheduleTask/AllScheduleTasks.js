@@ -21,6 +21,7 @@ export default function AllTasks() {
             });
             const data = await res.json();
             if (res.ok) {
+                // console.log(data);
                 setTasks(data);
                 setFilteredTasks(data);
             } else {
@@ -38,20 +39,35 @@ export default function AllTasks() {
             .split(',')
             .map(t => t.trim().toLowerCase())
             .filter(Boolean);
-
         let filtered = taskList.filter(task => {
-            const taskStart = new Date(task.startTime);
-            const taskEnd = new Date(task.endTime);
-
+            const startUTC = new Date(task.startTime);
+            const endUTC = new Date(task.endTime);
             let matchesDate = true;
+
             if (date) {
                 const selected = new Date(date);
-                selected.setHours(0, 0, 0, 0);
-                taskStart.setHours(0, 0, 0, 0);
-                taskEnd.setHours(0, 0, 0, 0);
 
-                matchesDate = selected >= taskStart && selected <= taskEnd;
+                // Zero out time in UTC (to prevent local timezone distortion)
+                const selectedUTC = new Date(Date.UTC(
+                    selected.getUTCFullYear(),
+                    selected.getUTCMonth(),
+                    selected.getUTCDate()
+                ));
+                const startOnlyUTC = new Date(Date.UTC(
+                    startUTC.getUTCFullYear(),
+                    startUTC.getUTCMonth(),
+                    startUTC.getUTCDate()
+                ));
+                const endOnlyUTC = new Date(Date.UTC(
+                    endUTC.getUTCFullYear(),
+                    endUTC.getUTCMonth(),
+                    endUTC.getUTCDate()
+                ));
+
+                matchesDate = selectedUTC >= startOnlyUTC && selectedUTC <= endOnlyUTC;
             }
+
+
 
             const matchesSearch = terms.length === 0 || terms.some(term =>
                 task.taskName?.toLowerCase().includes(term) ||
@@ -215,8 +231,29 @@ export default function AllTasks() {
                                         <td className="py-2 px-4">{task.category}</td>
                                         <td className="py-2 px-4">{task.description}</td>
                                         <td className="py-2 px-4">{task.duration}</td>
-                                        <td className="py-2 px-4">{new Date(task.startTime).toLocaleString()}</td>
-                                        <td className="py-2 px-4">{new Date(task.endTime).toLocaleString()}</td>
+                                        <td className="py-2 px-4">
+                                            {(() => {
+                                                const isoString = task.startTime;
+                                                const [datePart, timePart] = isoString.split('T');
+                                                const [hourStr, minute] = timePart.split(':');
+                                                let hour = parseInt(hourStr);
+                                                const ampm = hour >= 12 ? 'PM' : 'AM';
+                                                hour = hour % 12 || 12;
+                                                return `${datePart} ${hour}:${minute} ${ampm}`;
+                                            })()}
+                                        </td>
+                                        {/* <td className="py-2 px-4">{new Date(task.endTime).toLocaleString()}</td> */}
+                                        <td className="py-2 px-4">
+                                            {(() => {
+                                                const isoString = task.endTime;
+                                                const [datePart, timePart] = isoString.split('T');
+                                                const [hourStr, minute] = timePart.split(':');
+                                                let hour = parseInt(hourStr);
+                                                const ampm = hour >= 12 ? 'PM' : 'AM';
+                                                hour = hour % 12 || 12;
+                                                return `${datePart} ${hour}:${minute} ${ampm}`;
+                                            })()}
+                                        </td>
                                         <td className="py-2 px-4 space-x-2">
                                             <Link to={`/EditTask/${task._id}`} className="text-blue-500 hover:underline">Edit</Link>
                                             <button
