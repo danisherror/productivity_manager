@@ -46,10 +46,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
   const toggleTasksDropdown = () => setShowTasksDropdown(!showTasksDropdown);
 
   const linkClasses = (path) =>
-    `block px-4 py-2 rounded-md my-1 transition-colors duration-200 ${
-      location.pathname === path
-        ? 'bg-blue-600 text-white'
-        : 'bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white'
+    `block px-4 py-2 rounded-md my-1 transition-colors duration-200 ${location.pathname === path
+      ? 'bg-blue-600 text-white'
+      : 'bg-gray-200 text-gray-800 hover:bg-blue-500 hover:text-white'
     }`;
 
   return (
@@ -64,9 +63,8 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-40 transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0`}
+        className={`fixed top-0 left-0 h-full w-64 bg-gray-800 text-white z-40 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          } md:translate-x-0`}
       >
         <div className="p-4 font-bold text-xl border-b border-gray-700">My App</div>
         <nav className="p-4 space-y-2">
@@ -139,9 +137,17 @@ export default function Sidebar({ isOpen, setIsOpen }) {
       {isLoggedIn && (
         <>
           <button
+            onClick={() => navigate('/CreateUserExpenses')}
+            title="Create Expense"
+            className="fixed bottom-52 right-5 w-14 h-14 rounded-full bg-purple-600 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 z-50"
+          >
+            💸
+          </button>
+
+          <button
             onClick={() => navigate('/CreateScheduleTask')}
             title="Create Schedule Task"
-            className="fixed bottom-5 right-5 w-14 h-14 rounded-full bg-blue-600 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
+            className="fixed bottom-36 right-5 w-14 h-14 rounded-full bg-blue-600 text-white text-3xl flex items-center justify-center shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
           >
             +
           </button>
