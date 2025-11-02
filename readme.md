@@ -45,3 +45,9 @@ EMAIL_USERNAME=<email>
 EMAIL_PASSWORD=<app password from google>
 EMAIL_SECRET=secretkey
 ```
+---
+
+# Client .env
+```.env
+REACT_APP_BACKEND_URL=
+```
